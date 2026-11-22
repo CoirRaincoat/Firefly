@@ -53,6 +53,8 @@ export const fontsList: FontDefinition[] = [
 		styles: ["normal"],
 		subsets: ["latin", "cyrillic"],
 		fallbacks: [
+			// [custom] Windows 上优先回退到 Cascadia Code
+			"Cascadia Code",
 			"ui-monospace",
 			"SFMono-Regular",
 			"Menlo",

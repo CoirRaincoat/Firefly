@@ -1,5 +1,6 @@
 ---
 title: "Firefly 主题模版"
+draft: true # [custom] 上游演示内容，生产构建中隐藏
 slug: firefly
 published: 2025-10-01
 order: 100

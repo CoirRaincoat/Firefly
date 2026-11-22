@@ -6,13 +6,14 @@ export const profileConfig: ProfileConfig = {
 	// 1. public 目录（以 "/" 开头，不优化）："/assets/images/avatar.webp"
 	// 2. src 目录（不以 "/" 开头，自动优化但会增加构建时间，推荐）："assets/images/avatar.webp"
 	// 3. 远程 URL："https://example.com/avatar.jpg"
+	// [custom] TODO 占位：头像仍为上游示例图，替换为你的原创或授权头像
 	avatar: "assets/images/avatar.avif",
 
-	// 名字
-	name: "XiaYe",
+	// 名字（[custom] TODO 占位）
+	name: "Your Name",
 
 	// 个人签名
-	bio: "Hello, I'm XiaYe.",
+	bio: "博学而笃志，切问而近思",
 
 	// 链接配置
 	// 已经预装的图标集：fa7-brands，fa7-regular，fa7-solid，material-symbols，simple-icons
@@ -24,13 +25,15 @@ export const profileConfig: ProfileConfig = {
 		{
 			name: "GitHub",
 			icon: "fa7-brands:github",
-			url: "https://github.com/CuteLeaf",
+			// [custom] TODO 占位：替换为你的 GitHub 主页
+			url: "https://github.com/your-username",
 			showName: false,
 		},
 		{
 			name: "Email",
 			icon: "fa7-solid:envelope",
-			url: "mailto:xiaye@msn.com",
+			// [custom] TODO 占位：替换为你的公开联系邮箱
+			url: "mailto:you@example.com",
 			showName: false,
 		},
 		{

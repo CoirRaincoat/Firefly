@@ -2,11 +2,11 @@ import type { MusicPlayerConfig } from "../types/musicConfig";
 
 // 音乐播放器配置
 export const musicPlayerConfig: MusicPlayerConfig = {
-	// 是否在导航栏显示音乐播放器入口
-	showInNavbar: true,
+	// 是否在导航栏显示音乐播放器入口（[custom] 不使用音乐播放器）
+	showInNavbar: false,
 
-	// 是否在侧边栏显示音乐播放器组件
-	showInSidebar: true,
+	// 是否在侧边栏显示音乐播放器组件（[custom] 不使用音乐播放器）
+	showInSidebar: false,
 
 	// 使用方式："meting" 使用 Meting API，"local" 使用本地音乐列表
 	mode: "local",

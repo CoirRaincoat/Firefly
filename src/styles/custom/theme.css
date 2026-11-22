@@ -1,0 +1,141 @@
+/*
+ * [custom] 站点视觉主题覆盖层
+ *
+ * 只覆盖 src/styles/variables.styl 中已有的主题变量，并新增少量 --brand-* 设计令牌，
+ * 不修改上游样式文件。由 src/layouts/Layout.astro 在 variables.styl 之后引入。
+ *
+ * 约定：
+ * - 中性色（背景、文字、边框）使用固定色值，保证 Miku Teal / Tokyo Night 的整体观感；
+ * - 强调色（--primary、按钮、链接）继续使用 var(--hue)，设置面板里的色相滑块仍然有效。
+ *   siteConfig.themeColor.hue = 185 时，强调色接近 #39C5BB。
+ * - 组件规则放在 @layer components 中，Tailwind utilities 仍可覆盖，不使用 !important。
+ */
+
+/* ===== 品牌令牌（亮色） ===== */
+:root {
+	--brand-teal: #39c5bb;
+	--brand-lavender: #9d8ceb;
+	--brand-blue: #7aa2f7;
+	--brand-ink: #30394f;
+	--brand-muted: #778397;
+	--brand-soft: #e8f8f7;
+	--brand-card: #ffffff;
+	--brand-gradient: linear-gradient(
+		135deg,
+		var(--brand-teal) 0%,
+		var(--brand-blue) 55%,
+		var(--brand-lavender) 100%
+	);
+
+	/* 正文与元信息用 ink 系，比纯黑柔和 */
+	--brand-text: var(--brand-ink);
+	--brand-text-muted: #5f6b80; /* 比 #778397 更深，白底小字对比度约 5:1 */
+
+	--card-shadow: 0 1px 2px rgb(48 57 79 / 0.04), 0 4px 16px rgb(48 57 79 / 0.05);
+	--card-shadow-hover: 0 2px 4px rgb(48 57 79 / 0.05), 0 10px 28px rgb(48 57 79 / 0.08);
+
+	/* ===== 覆盖上游主题变量（亮色） ===== */
+	--radius-large: 0.875rem;
+
+	--primary: oklch(0.72 0.12 var(--hue));
+	--page-bg: #fafcff;
+	--card-bg: var(--brand-card);
+	--float-panel-bg: var(--brand-card);
+
+	--deep-text: var(--brand-ink);
+	--line-divider: rgb(48 57 79 / 0.08);
+	--line-color: rgb(48 57 79 / 0.1);
+	--meta-divider: rgb(48 57 79 / 0.2);
+	--content-meta: rgb(48 57 79 / 0.72);
+
+	--muted: oklch(0.97 0.02 var(--hue));
+	--selection-bg: oklch(0.9 0.06 var(--hue));
+}
+
+/* ===== 暗色：Tokyo Night 中性色 + 主题色相强调色 ===== */
+:root.dark {
+	--brand-teal: #5fd7cc;
+	--brand-lavender: #bb9af7;
+	--brand-blue: #7aa2f7;
+	--brand-ink: #c0caf5;
+	--brand-muted: #9aa5ce;
+	--brand-soft: rgb(95 215 204 / 0.1);
+	--brand-card: #1f2335;
+
+	--brand-text: var(--brand-ink);
+	--brand-text-muted: #a9b1d6;
+
+	--card-shadow: 0 1px 2px rgb(0 0 0 / 0.2), 0 4px 16px rgb(0 0 0 / 0.18);
+	--card-shadow-hover: 0 2px 4px rgb(0 0 0 / 0.24), 0 10px 28px rgb(0 0 0 / 0.26);
+
+	--primary: oklch(0.8 0.12 var(--hue));
+	--page-bg: #1a1b26;
+	--card-bg: var(--brand-card);
+	--card-bg-transparent: rgb(31 35 53 / var(--card-transparent-opacity, 0.6));
+	--float-panel-bg: #1d2031;
+
+	--btn-regular-bg: #292e42;
+	--btn-regular-bg-hover: #2f354d;
+	--btn-regular-bg-active: #3b4261;
+	--btn-plain-bg-hover: #292e42;
+	--btn-plain-bg-active: #24283b;
+	--btn-card-bg-hover: #292e42;
+	--btn-card-bg-active: #3b4261;
+
+	--deep-text: var(--brand-ink);
+	--line-divider: rgb(169 177 214 / 0.1);
+	--line-color: rgb(169 177 214 / 0.12);
+	--meta-divider: rgb(169 177 214 / 0.24);
+	--content-meta: rgb(192 202 245 / 0.62);
+
+	--muted: #24283b;
+	--selection-bg: #33467c;
+	--codeblock-bg: #16161e;
+	--codeblock-topbar-bg: #101014;
+
+	--toc-btn-hover: #292e42;
+	--toc-btn-active: #3b4261;
+	--toc-indicator-bg: #292e42;
+}
+
+/* ===== 卡片层次 ===== */
+@layer components {
+	/* siteConfig.card.border = true 时上游会加 border + shadow-xs，这里换成更柔和的双层阴影 */
+	.enable-card-border .card-base {
+		box-shadow: var(--card-shadow);
+	}
+
+	/* 文章卡片与项目卡片：悬停时只加深阴影并给边框一点主题色，不做位移，避免影响瀑布流定位 */
+	.enable-card-border :is(.post-card-wrapper, .project-card):hover {
+		box-shadow: var(--card-shadow-hover);
+		border-color: color-mix(in oklch, var(--primary) 35%, var(--line-divider));
+	}
+
+	/* 代码与等宽场景：fontConfig.codeFont 加载 JetBrains Mono，失败时回退到 Cascadia Code 等系统等宽字体 */
+	:where(code, kbd, samp, pre) {
+		font-family: var(
+			--font-code,
+			"JetBrains Mono",
+			"Cascadia Code",
+			ui-monospace,
+			SFMono-Regular,
+			Menlo,
+			Consolas,
+			monospace
+		);
+	}
+}
+
+/* ===== 减少动态效果 ===== */
+@media (prefers-reduced-motion: reduce) {
+	html {
+		scroll-behavior: auto;
+	}
+
+	/* 只作用于本站新增组件（类名前缀 home-），不改动上游组件的动画 */
+	:where([class^="home-"], [class*=" home-"]) {
+		transition-duration: 0.01ms;
+		animation-duration: 0.01ms;
+		animation-iteration-count: 1;
+	}
+}

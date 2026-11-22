@@ -1,5 +1,6 @@
 ---
 title: Markdown 教程
+draft: true # [custom] 上游演示内容，生产构建中隐藏
 published: 1970-01-01
 pinned: false
 description: 一个简明的 Markdown 博客示例。

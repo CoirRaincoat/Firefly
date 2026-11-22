@@ -1,0 +1,44 @@
+---
+// [custom] 首页精选项目：复用 getSortedProjects()（order 降序）与现有 ProjectCard，没有项目时整块不渲染
+import ProjectCard from "@/components/pages/projects/ProjectCard.astro";
+import { siteConfig } from "@/config";
+import { homeConfig } from "@/config/homeConfig";
+import { getSortedProjects } from "@/utils/content-utils";
+import { getFileDirFromPath, removeFileExtension } from "@/utils/url-utils";
+import "@/styles/pages/card-grid.css";
+import HomeSectionHeading from "./HomeSectionHeading.astro";
+
+const { featuredProjects } = homeConfig;
+const enabled = featuredProjects.enable && siteConfig.pages.projects;
+
+const projects = enabled
+	? (await getSortedProjects()).slice(0, featuredProjects.limit)
+	: [];
+---
+
+{
+	projects.length > 0 && (
+		<section class="home-projects onload-animation" aria-labelledby="home-projects-title">
+			<HomeSectionHeading
+				id="home-projects-title"
+				title={featuredProjects.title}
+				href="/projects/"
+			/>
+			<div class="card-grid" style="--card-grid-min-width: 260px">
+				{projects.map((p) => (
+					<ProjectCard
+						id={removeFileExtension(p.id)}
+						title={p.data.title}
+						description={p.data.description}
+						image={p.data.image}
+						basePath={getFileDirFromPath(p.filePath || "")}
+						tags={p.data.tags}
+						published={p.data.published}
+						link={p.data.link}
+						status={p.data.status}
+					/>
+				))}
+			</div>
+		</section>
+	)
+}

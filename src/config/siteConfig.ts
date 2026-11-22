@@ -10,10 +10,10 @@ const SITE_LANG = resolveSiteLang("zh_CN");
 const pages = resolvePageToggles({
 	// ── 社交 (Social) ──────────────────────────────────
 
-	// 友链页面开关
-	friends: true,
-	// 留言板页面开关，需要配置评论系统
-	guestbook: true,
+	// 友链页面开关（[custom] 暂无真实友链，先关闭）
+	friends: false,
+	// 留言板页面开关，需要配置评论系统（[custom] 评论系统未配置，先关闭）
+	guestbook: false,
 
 	// ── 我的 (My) ──────────────────────────────────
 
@@ -21,10 +21,10 @@ const pages = resolvePageToggles({
 	dynamic: true,
 	// 项目展示页开关
 	projects: true,
-	// 相册页面开关
-	gallery: true,
-	// 书签导航页面开关
-	booknav: true,
+	// 相册页面开关（[custom] 暂无真实相册，先关闭）
+	gallery: false,
+	// 书签导航页面开关（[custom] 暂无真实书签，先关闭）
+	booknav: false,
 	// 哔哩哔哩追番页面开关
 	bilibili: false,
 	// 番组计划页面开关
@@ -36,41 +36,43 @@ const pages = resolvePageToggles({
 
 	// ── 关于 (About) ──────────────────────────────────
 
-	// 打赏页面开关
-	sponsor: true,
+	// 打赏页面开关（[custom] 暂无收款方式，先关闭）
+	sponsor: false,
 });
 
 export const siteConfig: SiteConfig = {
-	// 站点标题
-	title: "Firefly",
+	// 站点标题（[custom] TODO 占位：替换为你的站点名称）
+	title: "Personal Digital Space",
 
 	// 站点副标题
-	subtitle: "Demo site",
+	subtitle: "Curiosity, craft & open source",
 
-	// 站点 URL
-	site_url: "https://firefly.cuteleaf.cn",
+	// 站点 URL（[custom] TODO 占位：上线前替换为真实域名，Sitemap / RSS / canonical 依赖此项）
+	site_url: "https://example.com",
 
 	// 站点描述
 	description:
-		"Firefly 是一款基于 Astro 框架和 Fuwari 模板开发的清新美观且现代化个人博客主题模板，专为技术爱好者和内容创作者设计。该主题融合了现代 Web 技术栈，提供了丰富的功能模块和高度可定制的界面，让您能够轻松打造出专业且美观的个人博客网站。",
+		"博学而笃志，切问而近思。一个记录 AI、网络安全、编程与系统实践的个人数字空间。",
 
 	// 站点关键词
 	keywords: [
-		"Firefly",
-		"Fuwari",
-		"Astro",
-		"ACGN",
-		"博客",
+		"个人网站",
 		"技术博客",
-		"静态博客",
+		"AI",
+		"LLM",
+		"网络安全",
+		"编程",
+		"开源",
+		"ACG",
 	],
 
 	// 主题色
 	themeColor: {
 		// 主题色的默认色相，范围从 0 到 360。例如：红色：0，青色：200，蓝绿色：250，粉色：345
-		hue: 165,
+		// [custom] 185 ≈ Miku Teal #39C5BB 的 oklch 色相，阶段 2 根据实际渲染微调
+		hue: 185,
 		// 默认模式："light" 亮色，"dark" 暗色，"system" 跟随系统
-		defaultMode: "system",
+		defaultMode: "light",
 	},
 
 	// 页面整体宽度（单位：rem）
@@ -81,7 +83,8 @@ export const siteConfig: SiteConfig = {
 	// 网站Card样式配置
 	card: {
 		// 是否开启卡片边框和阴影，开启后让网站更有立体感
-		border: false,
+		// [custom] 开启轻边框与柔和阴影区分卡片层次
+		border: true,
 		// 是否让卡片风格跟随主题色相
 		followTheme: false,
 	},
@@ -117,7 +120,8 @@ export const siteConfig: SiteConfig = {
 			alt: "🍀",
 		},
 		// 导航栏标题
-		title: "Firefly Blog",
+		// [custom] TODO 占位：替换为你的站点品牌名
+		title: "Digital Space",
 		// 全宽导航栏，导航栏是否占满屏幕宽度
 		widthFull: false,
 		// 导航菜单对齐方式，left：左对齐，center：居中

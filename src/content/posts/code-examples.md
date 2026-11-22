@@ -1,5 +1,6 @@
 ---
 title: Firefly 代码块示例
+draft: true # [custom] 上游演示内容，生产构建中隐藏
 published: 1970-01-03
 pinned: false
 description: 在Firefly中使用表达性代码的代码块在 Markdown 中的外观。

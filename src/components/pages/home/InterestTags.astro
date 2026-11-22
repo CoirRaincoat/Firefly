@@ -1,0 +1,77 @@
+---
+// [custom] 首页兴趣标签：配置在 homeConfig.interests；配置了 tag 的项链接到文章标签筛选
+import { Icon } from "astro-icon/components";
+import { homeConfig } from "@/config/homeConfig";
+import { getTagUrl } from "@/utils/url-utils";
+import HomeSectionHeading from "./HomeSectionHeading.astro";
+
+const { interests } = homeConfig;
+---
+
+{
+	interests.enable && interests.items.length > 0 && (
+		<section class="home-interests onload-animation" aria-labelledby="home-interests-title">
+			<HomeSectionHeading id="home-interests-title" title={interests.title} />
+			<ul class="home-interest-list">
+				{interests.items.map((item) => (
+					<li>
+						{item.tag ? (
+							<a href={getTagUrl(item.tag)} class="home-interest-chip is-link">
+								<Icon name={item.icon} aria-hidden="true" />
+								<span>{item.name}</span>
+							</a>
+						) : (
+							<span class="home-interest-chip">
+								<Icon name={item.icon} aria-hidden="true" />
+								<span>{item.name}</span>
+							</span>
+						)}
+					</li>
+				))}
+			</ul>
+		</section>
+	)
+}
+
+<style>
+	.home-interest-list {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
+		gap: 0.625rem;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.home-interest-chip {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		height: 100%;
+		padding: 0.7rem 0.9rem;
+		border: 1px solid var(--line-divider);
+		border-radius: var(--radius-xl);
+		background: var(--card-bg);
+		box-shadow: var(--card-shadow);
+		font-size: 0.9rem;
+		font-weight: 600;
+		color: var(--deep-text);
+	}
+
+	.home-interest-chip :global(svg) {
+		flex-shrink: 0;
+		font-size: 1.25rem;
+		color: var(--primary);
+	}
+
+	.home-interest-chip.is-link {
+		transition:
+			border-color var(--duration-normal) var(--ease-standard),
+			color var(--duration-normal) var(--ease-standard);
+	}
+
+	.home-interest-chip.is-link:hover {
+		border-color: var(--primary);
+		color: var(--primary);
+	}
+</style>

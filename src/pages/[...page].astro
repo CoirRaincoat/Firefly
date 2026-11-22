@@ -2,6 +2,7 @@
 import type { GetStaticPaths } from "astro";
 import Pagination from "@/components/common/Pagination.astro";
 import PostPage from "@/components/layout/PostPage.astro";
+import HomePortal from "@/components/pages/home/HomePortal.astro"; // [custom]
 import { siteConfig } from "@/config";
 import I18nKey from "@/i18n/i18nKey";
 import { i18n } from "@/i18n/translation";
@@ -28,6 +29,8 @@ const heading =
 ---
 
 <MainGridLayout heading={heading}>
+  {/* [custom] 首页门户区，仅第 1 页显示；分页逻辑不变 */}
+  {page.currentPage === 1 && <HomePortal hasPosts={len > 0} />}
   <PostPage page={page} />
   {
     page.total > page.size && (

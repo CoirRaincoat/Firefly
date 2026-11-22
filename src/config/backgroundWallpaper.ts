@@ -2,9 +2,10 @@ import type { BackgroundWallpaperConfig } from "@/types/backgroundWallpaper";
 
 export const backgroundWallpaper: BackgroundWallpaperConfig = {
 	// 壁纸模式："banner" 横幅壁纸，"fullscreen" 全屏壁纸，"overlay" 覆盖透明，"none" 纯色背景无壁纸
-	mode: "banner",
-	// 是否启用背景视频播放，配置后将在导航栏显示视频播放按钮
-	playerEnable: true,
+	// [custom] 上游示例壁纸是现成动漫角色图，按任务书不作为主视觉，先用纯色背景；首页 Hero 在阶段 3 实现
+	mode: "none",
+	// 是否启用背景视频播放，配置后将在导航栏显示视频播放按钮（[custom] 不使用背景视频）
+	playerEnable: false,
 	/**
 	 * 背景图片配置
 	 * 图片路径支持三种格式：

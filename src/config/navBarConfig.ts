@@ -10,126 +10,36 @@ import {
 // NavBar Configuration - Dynamically generate navigation bar links based on order
 // ============================================================================
 const getDynamicNavBarConfig = (): NavBarConfig => {
-	// 基础导航栏链接
+	// [custom] 导航结构改为 Home / Projects / Blog / Notes / About（任务书 4.1）
+	// 上游原有的「社交」「我的」「关于」「链接」分组已移除，LinkPresets 保持不变，需要时可重新加入
 	const links: NavBarLink[] = [];
 
 	// 主页
-	links.push(LinkPresets.Home);
+	links.push({ ...LinkPresets.Home, name: "Home" });
 
-	// 文章及其子菜单
+	// 项目作品集（pageKey 关闭时自动隐藏）
+	links.push({ ...LinkPresets.Projects, name: "Projects" });
+
+	// 博客：文章列表在首页分页中，这里提供归档、分类、标签入口
 	links.push({
-		name: "文章",
+		name: "Blog",
 		url: "#",
 		icon: "material-symbols:article",
-		children: [
-			// 归档
-			LinkPresets.Archive,
-
-			// 分类
-			LinkPresets.Categories,
-
-			// 标签
-			LinkPresets.Tags,
-
-			// 系列
-			LinkPresets.Series,
-		],
+		children: [LinkPresets.Archive, LinkPresets.Categories, LinkPresets.Tags],
 	});
 
-	//社交及其子菜单
-	links.push({
-		name: "社交",
-		url: "#",
-		icon: "material-symbols:group",
-		children: [
-			// 友链
-			LinkPresets.Friends,
+	// 动态与短笔记，复用原生 Dynamic 页面
+	links.push({ ...LinkPresets.Dynamic, name: "Notes" });
 
-			// 留言
-			LinkPresets.Guestbook,
-		],
-	});
+	// 关于我
+	links.push({ ...LinkPresets.About, name: "About" });
 
-	// 我的及其子菜单
-	links.push({
-		name: "我的",
-		url: "#",
-		icon: "material-symbols:person",
-		children: [
-			// 动态
-			LinkPresets.Dynamic,
-
-			// 项目
-			LinkPresets.Projects,
-
-			// 相册
-			LinkPresets.Gallery,
-
-			// 书签导航
-			LinkPresets.Booknav,
-
-			// 哔哩哔哩追番
-			LinkPresets.Bilibili,
-
-			// 番组计划
-			LinkPresets.Bangumi,
-
-			// VNDB
-			LinkPresets.VNDB,
-
-			// MyAnimeList
-			LinkPresets.MAL,
-		],
-	});
-
-	// 关于及其子菜单
-	links.push({
-		name: "关于",
-		url: "#",
-		icon: "material-symbols:info",
-		children: [
-			// 打赏
-			LinkPresets.Sponsor,
-
-			// 关于页面
-			LinkPresets.About,
-		],
-	});
-
-	// 自定义导航栏链接
-	links.push({
-		name: "链接",
-		url: "#",
-		icon: "material-symbols:link",
-		// 子菜单
-		children: [
-			{
-				name: "GitHub",
-				url: "https://github.com/CuteLeaf/Firefly",
-				external: true,
-				icon: "fa7-brands:github",
-			},
-			{
-				name: "Gitee",
-				url: "https://gitee.com/CuteLeaf/Firefly",
-				external: true,
-				icon: "fa7-brands:gitee",
-			},
-			{
-				name: "Firefly文档",
-				url: "https://docs-firefly.cuteleaf.cn",
-				external: true,
-				icon: "material-symbols:docs",
-			},
-		],
-	});
-
-	// 文档链接
+	// [custom] TODO：填好 profileConfig 中的真实 GitHub 地址后，可取消注释加入导航
 	// links.push({
-	// 	name: "文档",
-	// 	url: "https://docs-firefly.cuteleaf.cn",
+	// 	name: "GitHub",
+	// 	url: "https://github.com/your-username",
 	// 	external: true,
-	// 	icon: "material-symbols:docs",
+	// 	icon: "fa7-brands:github",
 	// });
 
 	return { links } as NavBarConfig;

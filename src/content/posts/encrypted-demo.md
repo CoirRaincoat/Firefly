@@ -1,5 +1,6 @@
 ---
 title: Firefly 文章加密
+draft: true # [custom] 上游演示内容，生产构建中隐藏
 published: 1970-01-02
 description: 这是一篇密码保护的示例文章，用于演示文章加密功能。
 tags: [示例, 密码保护]

@@ -1,0 +1,167 @@
+---
+// [custom] 首页最近动态：构建时读取 dynamic 集合，复用 sortDynamics / dynamicPlainText，
+// 链接到 /dynamic/ 页面中对应条目的锚点。没有动态或动态页关闭时整块不渲染。
+import { getCollection } from "astro:content";
+import { Icon } from "astro-icon/components";
+import { siteConfig } from "@/config";
+import { homeConfig } from "@/config/homeConfig";
+import { formatDynamicDate } from "@/utils/date-utils";
+import {
+	dynamicAnchor,
+	dynamicPlainText,
+	dynamicSlug,
+	sortDynamics,
+} from "@/utils/dynamic-utils";
+import { url } from "@/utils/url-utils";
+import HomeSectionHeading from "./HomeSectionHeading.astro";
+
+const { recentActivity } = homeConfig;
+const enabled = recentActivity.enable && siteConfig.pages.dynamic;
+
+const MAX_EXCERPT = 120;
+
+const items = enabled
+	? sortDynamics(await getCollection("dynamic"))
+			.slice(0, recentActivity.limit)
+			.map((entry) => {
+				const text = dynamicPlainText(entry);
+				const imageCount = (entry.body?.match(/!\[[^\]]*\]\([^)]+\)/g) || [])
+					.length;
+				return {
+					href: url(`/dynamic/#${dynamicAnchor(dynamicSlug(entry.id))}`),
+					date: entry.data.published,
+					pinned: !!entry.data.pinned,
+					location: entry.data.location,
+					imageCount,
+					excerpt:
+						text.length > MAX_EXCERPT
+							? `${text.slice(0, MAX_EXCERPT).trimEnd()}…`
+							: text,
+				};
+			})
+	: [];
+---
+
+{
+	items.length > 0 && (
+		<section class="home-activity onload-animation" aria-labelledby="home-activity-title">
+			<HomeSectionHeading
+				id="home-activity-title"
+				title={recentActivity.title}
+				href="/dynamic/"
+			/>
+			<ol class="home-activity-list card-base">
+				{items.map((item) => (
+					<li>
+						<a href={item.href} class="home-activity-item">
+							<span class="home-activity-dot" aria-hidden="true" />
+							<span class="home-activity-body">
+								<span class="home-activity-meta">
+									<time datetime={item.date.toISOString()}>
+										{formatDynamicDate(item.date)}
+									</time>
+									{item.pinned && (
+										<span class="home-activity-tag">
+											<Icon name="material-symbols:keep-outline" aria-hidden="true" />
+											Pinned
+										</span>
+									)}
+									{item.location && (
+										<span class="home-activity-tag">
+											<Icon name="material-symbols:location-on-outline-rounded" aria-hidden="true" />
+											{item.location}
+										</span>
+									)}
+									{item.imageCount > 0 && (
+										<span class="home-activity-tag">
+											<Icon name="material-symbols:image-outline-rounded" aria-hidden="true" />
+											{item.imageCount}
+										</span>
+									)}
+								</span>
+								<span class="home-activity-text">
+									{item.excerpt || "（图片动态）"}
+								</span>
+							</span>
+						</a>
+					</li>
+				))}
+			</ol>
+		</section>
+	)
+}
+
+<style>
+	.home-activity-list {
+		margin: 0;
+		padding: 0.5rem;
+		list-style: none;
+	}
+
+	.home-activity-item {
+		position: relative;
+		display: flex;
+		gap: 0.875rem;
+		padding: 0.75rem 0.75rem;
+		border-radius: var(--radius-xl);
+		color: inherit;
+		transition: background-color var(--duration-normal) var(--ease-standard);
+	}
+
+	.home-activity-item:hover {
+		background: var(--btn-plain-bg-hover);
+	}
+
+	/* 时间轴竖线：连接相邻条目的圆点 */
+	li:not(:last-child) .home-activity-item::after {
+		content: "";
+		position: absolute;
+		left: calc(0.75rem + 0.3rem - 1px);
+		top: 1.75rem;
+		bottom: -0.75rem;
+		width: 2px;
+		background: var(--line-divider);
+	}
+
+	.home-activity-dot {
+		flex-shrink: 0;
+		width: 0.6rem;
+		height: 0.6rem;
+		margin-top: 0.4rem;
+		border-radius: var(--radius-full);
+		background: var(--primary);
+		box-shadow: 0 0 0 4px var(--brand-soft);
+	}
+
+	.home-activity-body {
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+		min-width: 0;
+	}
+
+	.home-activity-meta {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.375rem 0.75rem;
+		font-size: 0.8rem;
+		color: var(--content-meta);
+	}
+
+	.home-activity-tag {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.2rem;
+	}
+
+	.home-activity-text {
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 2;
+		line-clamp: 2;
+		overflow: hidden;
+		line-height: 1.6;
+		color: var(--deep-text);
+	}
+</style>

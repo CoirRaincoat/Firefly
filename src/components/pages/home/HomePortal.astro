@@ -1,0 +1,51 @@
+---
+// [custom] 首页门户区：只在 [...page].astro 第 1 页插入，现有文章列表继续作为 Recent Posts
+import { homeConfig } from "@/config/homeConfig";
+import FeaturedProjects from "./FeaturedProjects.astro";
+import HomeHero from "./HomeHero.astro";
+import HomeSectionHeading from "./HomeSectionHeading.astro";
+import InterestTags from "./InterestTags.astro";
+import RecentActivity from "./RecentActivity.astro";
+
+interface Props {
+	/** 第 1 页是否有文章，没有时不显示 Recent Posts 标题 */
+	hasPosts: boolean;
+}
+
+const { hasPosts } = Astro.props;
+---
+
+{
+	homeConfig.enable && (
+		<div class="home-portal">
+			<HomeHero />
+			<InterestTags />
+			<FeaturedProjects />
+			<RecentActivity />
+			{hasPosts && (
+				<div class="onload-animation">
+					<HomeSectionHeading
+						id="home-posts-title"
+						title={homeConfig.recentPosts.title}
+						href="/archive/"
+					/>
+				</div>
+			)}
+		</div>
+	)
+}
+
+<style>
+	.home-portal {
+		display: flex;
+		flex-direction: column;
+		gap: 1.75rem;
+		margin-bottom: 0.75rem;
+	}
+
+	@media (max-width: 767px) {
+		.home-portal {
+			gap: 1.25rem;
+		}
+	}
+</style>
