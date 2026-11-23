@@ -436,6 +436,9 @@ enum I18nKey {
 	siteStatsLastUpdate = "siteStatsLastUpdate",
 	siteStatsDaysAgo = "siteStatsDaysAgo",
 	siteStatsDays = "siteStatsDays",
+	// [custom] 站点统计：访客数 / 总浏览量
+	siteStatsVisitors = "siteStatsVisitors",
+	siteStatsPageViews = "siteStatsPageViews",
 	today = "today",
 
 	// 站点信息

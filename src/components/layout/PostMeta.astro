@@ -1,6 +1,7 @@
 ---
 import { Icon } from "astro-icon/components";
 import { commentConfig } from "@/config";
+import { viewStatsConfig } from "@/config/viewStatsConfig"; // [custom]
 import I18nKey from "@/i18n/i18nKey";
 import { i18n } from "@/i18n/translation";
 import { formatDateToYYYYMMDD } from "@/utils/date-utils";
@@ -59,6 +60,19 @@ const {
 const path = customPath || (id ? `/posts/${id}` : "");
 const visibleTags =
 	typeof maxTags === "number" ? tags?.slice(0, maxTags) : tags;
+
+// [custom] 浏览量占位：评论系统自带的浏览量已启用时不重复显示（见 viewStatsConfig.ts）
+const commentViewsActive =
+	(commentConfig.type === "twikoo" && !!commentConfig.twikoo?.visitorCount) ||
+	(commentConfig.type === "waline" && !!commentConfig.waline?.visitorCount) ||
+	(commentConfig.type === "artalk" && !!commentConfig.artalk?.visitorCount);
+const showViewStat =
+	!isHome &&
+	!!id &&
+	!commentViewsActive &&
+	viewStatsConfig.enable &&
+	viewStatsConfig.showPostViews;
+const viewStatPath = path.endsWith("/") ? path : `${path}/`;
 ---
 
 <div
@@ -249,6 +263,30 @@ const visibleTags =
           </span>
         </div>
       )
+  }
+
+  {/* [custom] 浏览量占位，尚未接入统计接口 */}
+  {
+    showViewStat && (
+      <div class="flex items-center">
+        <div class="meta-icon">
+          <Icon
+            name="material-symbols:visibility-outline-rounded"
+            class="text-xl"
+          />
+        </div>
+        <span class="text-50 text-sm font-medium mr-1">
+          {i18n(I18nKey.pageViews)}
+        </span>
+        <span
+          class="text-50 text-sm font-medium"
+          data-view-stat="post-views"
+          data-path={viewStatPath}
+        >
+          {viewStatsConfig.placeholder}
+        </span>
+      </div>
+    )
   }
 
   {

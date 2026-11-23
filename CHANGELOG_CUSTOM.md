@@ -131,8 +131,22 @@ Projects、Blog（归档 / 分类 / 标签）、文章详情页沿用上游组�
 
 后续调整（同日）：个人资料 `position` 改回 `top`。资料卡随页面滚走，统计卡滚到窗口顶部（导航栏显示时距顶 5.5rem，隐藏时 1rem）后与日历一起停住，不再出现「先跟着滚一段才停」的迟滞。统计 + 日历约 730px 高，窗口高度低于约 820px 时日历底部会被遮住一部分。截图确认 1440×900 下滚动多个位置时两张卡都停在顶部。
 
+## 阶段 11：浏览量 / 访客数占位（2026-11-23）
+
+只做界面位置，**不接入任何统计接口**，数值显示 `--`。后续计划接入 Umami，并排除站长本人的访问。
+
+| 文件 | 改动 | 原因 |
+| --- | --- | --- |
+| `src/config/viewStatsConfig.ts`（新增） | 总开关、文章页 / 站点统计分别开关、占位文字 | 集中配置；注释里写明后续脚本填数的 data 属性约定 |
+| `src/components/layout/PostMeta.astro` | 文章详情页信息栏加「浏览量 --」（`data-view-stat="post-views"`，`data-path="/posts/<id>/"`）；评论系统自带浏览量已启用时不显示，避免重复 | **上游组件改动**。复用上游的图标、样式和 `pageViews` 文案。文章列表卡片不传 `id`，所以不显示 |
+| `src/components/widget/SiteStats.astro` | 站点统计末尾加「访客数」「总浏览量」两行（`data-stat-id="site-visitors"` / `"site-pageviews"`） | **上游组件改动**，沿用原有行样式 |
+| `src/i18n/i18nKey.ts`、`src/i18n/languages/*.ts` | 新增 `siteStatsVisitors`、`siteStatsPageViews`，6 种语言 | `Translation` 类型要求每种语言都有全部键 |
+
+测试：`type-check`、`astro check`（0 错误）、Biome 通过；截图确认文章页信息栏和左栏统计卡显示占位，首页文章卡片不显示。
+
 ## 上线前必须处理（占位与遗留）
 
+- [ ] 浏览量 / 访客数目前是占位 `--`，接入统计接口前可在 `viewStatsConfig.ts` 关闭，避免上线后显示空值。
 - [ ] 全屏壁纸 `d1–d6` / `m1–m6`、文章封面和头像都是上游自带的游戏角色图，授权未确认。上线前换成自己有权使用的图片（`backgroundWallpaper.ts` 的 `src.desktop` / `src.mobile`）。
 - [ ] `siteConfig.site_url`、站点标题、导航栏标题、`profileConfig` 昵称 / GitHub / 邮箱：替换占位值。
 - [ ] `src/content/dynamic/` 中 4 条上游演示动态：该集合没有 `draft` 字段，**生产构建仍会显示**，上线前删除或替换为真实动态。
