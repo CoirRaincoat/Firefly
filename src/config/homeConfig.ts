@@ -27,7 +27,7 @@ export interface HomeConfig {
 	hero: {
 		/** 自我介绍卡片的问候语，{name} 会替换为 profileConfig.name */
 		greeting: string;
-		/** 座右铭（中 / 英）：显示在首屏全屏壁纸的副标题里（backgroundWallpaper.ts 读取） */
+		/** 座右铭（中 / 英）。首屏副标题已改为名句轮播（backgroundWallpaper.ts），这两项目前未被引用 */
 		motto: string;
 		mottoEn: string;
 		intro: string;

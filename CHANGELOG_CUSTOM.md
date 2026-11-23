@@ -163,6 +163,16 @@ Projects、Blog（归档 / 分类 / 标签）、文章详情页沿用上游组�
 
 测试：`astro check` 0 错误、Biome 通过、`pnpm build` exit 0。截图检查了 1440×900（亮色、暗色）、1024×768、820×1180、390×844，以及减少动态效果模式。字体由 Astro 下载，首次访问时标题字体没有预加载，可能短暂显示回退字体，入场模糊动画能遮掉大部分。
 
+## 阶段 13：首屏副标题改为名句轮播（2026-11-23）
+
+| 文件 | 改动 | 原因 |
+| --- | --- | --- |
+| `src/config/backgroundWallpaper.ts` | `homeText.subtitle` 由座右铭（中 / 英）改为 4 条名句（Sapere aude! / Nullius in verba. / Tennyson《Ulysses》两句），不含序号、中文释义和出处；字号 1.5rem → 1.25rem；打字速度 60ms、删除 25ms、停留 4s；去掉对 `homeConfig` 的引用 | 用户要求。沿用上游打字机效果轮播，不新增组件 |
+| `src/styles/custom/theme.css` | `.banner-subtitle` 设 `white-space: pre-line`，预留两行高度（≤640px 预留四行） | 每条名句里的 `\n` 换行能显示；打字过程中上方标题不跳动 |
+| `src/config/homeConfig.ts` | 注释说明 `hero.motto` / `mottoEn` 目前未被引用 | 座右铭仍保留在侧栏个人资料签名里（`profileConfig`），未改 |
+
+测试：type-check、Biome 通过；用 DevTools 协议读取副标题，确认有 4 条数据、换行生效；截图检查了 1440×900 和 390×844。
+
 ## 上线前必须处理（占位与遗留）
 
 - [ ] 浏览量 / 访客数目前是占位 `--`，接入统计接口前可在 `viewStatsConfig.ts` 关闭，避免上线后显示空值。

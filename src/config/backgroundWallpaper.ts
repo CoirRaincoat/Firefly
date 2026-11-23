@@ -1,5 +1,4 @@
 import type { BackgroundWallpaperConfig } from "@/types/backgroundWallpaper";
-import { homeConfig } from "./homeConfig";
 
 export const backgroundWallpaper: BackgroundWallpaperConfig = {
 	// 壁纸模式："banner" 横幅壁纸，"fullscreen" 全屏壁纸，"overlay" 覆盖透明，"none" 纯色背景无壁纸
@@ -81,21 +80,30 @@ export const backgroundWallpaper: BackgroundWallpaperConfig = {
 			// 主页横幅主标题字体大小（CelticTitle 中作为上限，窄屏自动缩小）
 			titleSize: "4.25rem",
 			// 主页横幅副标题
-			// [custom] 座右铭（中 / 英），文字集中在 homeConfig.hero 中维护
-			subtitle: [homeConfig.hero.motto, homeConfig.hero.mottoEn],
+			// [custom] 四条名句轮播（沿用上游打字机效果）；\n 换行由 theme.css 的 white-space: pre-line 保留
+			subtitle: [
+				"Sapere aude!\nDare to know! Have courage to use your own reason.",
+				"Nullius in verba.\nTake nobody's word for it.",
+				"To follow knowledge, like a sinking star,\nBeyond the utmost bound of human thought.",
+				"To strive, to seek, to find, and not to yield.",
+			],
 			// 主页横幅副标题字体大小
-			subtitleSize: "1.5rem",
+			// [custom] 1.5rem → 1.25rem，名句较长
+			subtitleSize: "1.25rem",
 			typewriter: {
 				// 是否启用打字机效果
 				// 打字机开启 → 循环显示所有副标题
 				// 打字机关闭 → 每次刷新随机显示一条副标题
 				enable: true,
 				// 打字速度（毫秒）
-				speed: 100,
+				// [custom] 100 → 60，名句较长
+				speed: 60,
 				// 删除速度（毫秒）
-				deleteSpeed: 50,
+				// [custom] 50 → 25
+				deleteSpeed: 25,
 				// 完全显示后的暂停时间（毫秒）
-				pauseTime: 2000,
+				// [custom] 2000 → 4000，留出阅读时间
+				pauseTime: 4000,
 			},
 			// 是否显示标题下方的链接图标
 			linksEnable: true,
