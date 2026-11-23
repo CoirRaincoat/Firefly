@@ -1,0 +1,137 @@
+/*
+ * [custom] 页面切换与入场动效覆盖层（由 theme.css @import，不改上游 transition.css / layout-base.css）
+ *
+ * 上游（120ms、2rem 位移、首页↔内页 220ms linear）偏急促。这里的思路：
+ * - 离场短而轻：主内容 200ms 淡出并上移 6px，像「收起」；
+ * - 入场慢而柔：主内容只做淡入，位移交给各卡片的 onload-animation（12px 上浮、600ms、
+ *   ease-out-expo 类曲线），配合上游已有的逐个延迟，形成轻柔的层叠浮现；
+ * - 首页 ↔ 内页的整屏位移（FLIP）从 linear 改为缓入缓出，时长 480ms；
+ * - Swup 用 .transition-swup-* 元素的过渡时长判断离场何时结束，这里同步拉长到 220ms，
+ *   保证离场动画播完才替换内容；
+ * - 进度条换成樱花粉 → 薰衣草 → 天蓝渐变。
+ * 只动 opacity / transform，不加 filter，避免移动端整屏重绘。
+ */
+
+:root {
+	--motion-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+	--motion-ease-in: cubic-bezier(0.4, 0, 1, 1);
+	--motion-ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+	--motion-leave: 200ms;
+	--motion-enter: 380ms;
+	--motion-rise: 600ms;
+	--motion-flip: 480ms;
+}
+
+/* ===== 主内容：离场 ===== */
+html.is-leaving .transition-main {
+	transition:
+		opacity var(--motion-leave) var(--motion-ease-in),
+		transform var(--motion-leave) var(--motion-ease-in);
+}
+
+html.is-animating.is-leaving .transition-main {
+	opacity: 0;
+	transform: translateY(-6px);
+}
+
+/* 上游让内层 #content-wrapper 同时反向位移 2rem，与外层叠加后方向混乱，这里中和掉 */
+html.is-animating.is-leaving .transition-leaving {
+	opacity: 1;
+	transform: none;
+}
+
+/* ===== 主内容：入场（新容器带着 is-animating 插入，从透明开始） ===== */
+.transition-main,
+html.is-changing:not(.is-leaving) .transition-main {
+	transition:
+		opacity var(--motion-enter) var(--motion-ease-out),
+		transform var(--motion-enter) var(--motion-ease-out);
+}
+
+html.is-animating:not(.is-leaving) .transition-main {
+	opacity: 0;
+	transform: none;
+}
+
+/* ===== Swup 计时元素（横幅文字层、侧栏占位） ===== */
+html.is-changing .transition-swup-fade {
+	transition:
+		opacity 220ms var(--motion-ease-in-out),
+		transform 220ms var(--motion-ease-in-out);
+}
+
+html.is-animating .transition-swup-fade {
+	opacity: 0;
+	transform: translateY(0.5rem);
+}
+
+/* ===== 卡片与区块的层叠浮现 ===== */
+@keyframes ff-rise {
+	from {
+		opacity: 0;
+		transform: translateY(12px);
+	}
+	to {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+/* 只换动画名、时长和曲线；delay 仍由上游 :nth-child 规则和内联 style 控制 */
+.onload-animation {
+	animation-name: ff-rise;
+	animation-duration: var(--motion-rise);
+	animation-timing-function: var(--motion-ease-out);
+	animation-fill-mode: both;
+}
+
+/* ===== 首页 ↔ 内页整屏位移（visit:start 里的 FLIP） ===== */
+html.is-page-transitioning .content-panel,
+html.is-page-transitioning #wallpaper-wrapper,
+html.is-page-transitioning #banner-overlay-container .banner-home-text-overlay,
+html.is-page-transitioning #banner-overlay-container .banner-page-title-overlay,
+html.is-page-transitioning #banner-overlay-container .banner-post-meta-overlay {
+	transition: transform var(--motion-flip) var(--motion-ease-in-out);
+}
+
+/* ===== 进度条 ===== */
+#progress-bar {
+	--progress-height: 2.5px;
+	background: linear-gradient(90deg, #f5a3c7 0%, #b9a5f2 55%, #8fc8f5 100%);
+	box-shadow: 0 0 10px rgb(245 163 199 / 0.55);
+	border-radius: 0 999px 999px 0;
+}
+
+/* ===== 减少动态效果：保留短淡入淡出，去掉位移和整屏滑动 ===== */
+@media (prefers-reduced-motion: reduce) {
+	html.is-animating.is-leaving .transition-main,
+	html.is-animating .transition-swup-fade {
+		transform: none;
+	}
+
+	.transition-main,
+	html.is-changing .transition-main,
+	html.is-leaving .transition-main {
+		transition: opacity 150ms linear;
+	}
+
+	.onload-animation {
+		animation-name: ff-fade;
+		animation-duration: 200ms;
+		animation-timing-function: linear;
+	}
+
+	html.is-page-transitioning .content-panel,
+	html.is-page-transitioning #wallpaper-wrapper,
+	html.is-page-transitioning #banner-overlay-container .banner-home-text-overlay,
+	html.is-page-transitioning #banner-overlay-container .banner-page-title-overlay,
+	html.is-page-transitioning #banner-overlay-container .banner-post-meta-overlay {
+		transition: none;
+	}
+}
+
+@keyframes ff-fade {
+	from {
+		opacity: 0;
+	}
+}

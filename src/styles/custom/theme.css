@@ -13,6 +13,9 @@
  * - 组件规则放在 @layer components 中，Tailwind utilities 仍可覆盖，不使用 !important。
  */
 
+/* 页面切换与入场动效（独立文件，便于整体开关） */
+@import "./motion.css";
+
 /* ===== 品牌令牌（亮色） ===== */
 :root {
 	--brand-pink: #f5a3c7;
