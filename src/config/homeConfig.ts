@@ -25,8 +25,9 @@ export interface HomeAction {
 export interface HomeConfig {
 	enable: boolean;
 	hero: {
-		/** 问候语，{name} 会替换为 profileConfig.name */
+		/** 自我介绍卡片的问候语，{name} 会替换为 profileConfig.name */
 		greeting: string;
+		/** 座右铭（中 / 英）：显示在首屏全屏壁纸的副标题里（backgroundWallpaper.ts 读取） */
 		motto: string;
 		mottoEn: string;
 		intro: string;
@@ -54,7 +55,9 @@ export interface HomeConfig {
 }
 
 export const homeConfig: HomeConfig = {
-	enable: true,
+	// [custom] 暂时关闭门户区：首页只显示文章列表（置顶在前，其余按发布时间倒序）。
+	// 组件保留在 src/components/pages/home/，改回 true 即恢复自我介绍、兴趣、精选项目、最近笔记
+	enable: false,
 	hero: {
 		greeting: "Hi, I'm {name}",
 		motto: "博学而笃志，切问而近思",

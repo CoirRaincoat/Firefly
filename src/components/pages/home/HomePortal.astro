@@ -39,13 +39,14 @@ const { hasPosts } = Astro.props;
 	.home-portal {
 		display: flex;
 		flex-direction: column;
-		gap: 1.75rem;
-		margin-bottom: 0.75rem;
+		/* [custom] 区块之间留足空白，首页铺开一些 */
+		gap: 3.5rem;
+		margin-bottom: 1.5rem;
 	}
 
 	@media (max-width: 767px) {
 		.home-portal {
-			gap: 1.25rem;
+			gap: 2.25rem;
 		}
 	}
 </style>

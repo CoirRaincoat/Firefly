@@ -4,10 +4,12 @@ import type { SakuraConfig } from "../types/effectsConfig";
 
 export const sakuraConfig: SakuraConfig = {
 	// 是否启用樱花特效
-	enable: false,
+	// [custom] 开启，配合樱花色主题；系统「减少动态效果」时不显示（见 SakuraEffect.astro）
+	enable: true,
 
 	// 樱花数量
-	sakuraNum: 21,
+	// [custom] 21 → 12，少量点缀，不干扰阅读
+	sakuraNum: 12,
 
 	// 樱花越界限制次数，-1为无限循环
 	limitTimes: -1,

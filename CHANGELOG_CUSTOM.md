@@ -77,8 +77,63 @@ Projects、Blog（归档 / 分类 / 标签）、文章详情页沿用上游组�
 | Lighthouse | **未运行**：本机没有 Lighthouse CLI，按约定不新增依赖 |
 | 键盘焦点 | 沿用上游全站焦点环，**未逐项手动 Tab 测试** |
 
+## 阶段 6：全屏首屏 + 樱花色毛玻璃（2026-11-23）
+
+参考 justpureh2o.cn（Firefly 全屏壁纸模式）和 anoth3r.top（全屏封面）：首屏是全屏大图和标题，往下滚才是内容卡片。
+
+| 文件 | 改动 | 原因 |
+| --- | --- | --- |
+| `src/config/backgroundWallpaper.ts` | `mode` `none` → `fullscreen`，`fullscreen.layout` `classic` → `hero`；横幅标题改为占位，副标题改为读取 `homeConfig.hero` 的座右铭；横幅链接换成占位 GitHub / Email，去掉上游 Sponsor | 用上游自带的全屏壁纸实现「大图先出」。`hero` 布局下卡片半透明、壁纸随下滑模糊，就是毛玻璃效果 |
+| `src/config/siteConfig.ts` | `hue` 185 → 350 | 樱花粉强调色 |
+| `src/config/effectsConfig.ts` | 樱花特效开启，数量 21 → 12 | 用户选择 |
+| `src/components/features/SakuraEffect.astro` | 用户没在设置面板手动开过时，系统「减少动态效果」下不显示樱花 | **上游组件改动**：原组件没有处理 `prefers-reduced-motion` |
+| `src/styles/custom/theme.css` | 配色换成樱花粉 / 薰衣草紫 / 天蓝，梅紫色正文；暗色改为「夜樱」梅紫色调；`--card-bg-transparent` 跟随新配色；半透明卡片加白色高光描边；横幅标题加投影；圆角 1.125rem | 明快樱花色 ACG 风 |
+| `src/components/pages/home/HomeHero.astro` | 改成自我介绍卡片：问候（名字用主题色）、简介、按钮；终端插画换成原创樱花 SVG；去掉座右铭（已移到首屏） | 首屏已有大标题，避免重复 |
+| `src/components/pages/home/HomeSectionHeading.astro` | 区块标题和「View all」放在半透明玻璃胶囊上 | 标题直接叠在壁纸上，深色壁纸处看不清 |
+| `HomePortal.astro`、`InterestTags.astro`、`RecentActivity.astro` | 区块间距 1.75rem → 3.5rem（手机 2.25rem），标签和列表加大内边距；兴趣标签改用 `card-base`，跟随毛玻璃透明度 | 首页铺开一些 |
+
+说明：
+- 没有给每张卡片加 `backdrop-filter`。模糊来自上游的壁纸模糊渐变（`blurRamp`），开销只有一层，符合 `CLAUDE.md` 里的滚动性能约束。
+- 测试：`type-check`、`astro check`（0 错误）、Biome、`pnpm build`（exit 0）通过。用 Edge headless + DevTools 协议截了滚动后的画面：亮色 1440px、暗色 1440px、手机 390px 宽度都正常显示。
+
+## 阶段 7：首页留白（2026-11-23）
+
+参考 anoth3r.top：首屏大图之后只有一列居中的文章列表，两侧留空。
+
+| 文件 | 改动 | 原因 |
+| --- | --- | --- |
+| `src/config/sidebarConfig.ts` | 左栏、右栏、移动端底部的所有组件 `enable` → `false`；总开关 `enable` 保持 `true` | 去掉侧边卡片。总开关保持开启，是因为上游只有在「侧栏功能开启但本页没有侧栏列」时才按 `noSidebarContentWidth`（0.6）收窄内容栏并居中；总开关关掉反而会铺满全宽 |
+| `src/config/homeConfig.ts` | `enable` → `false` | 首页只保留文章列表：置顶文章在前，其余按发布时间倒序（上游 `getSortedPosts` 的排序）。门户区组件保留，改回 `true` 即恢复 |
+
+说明：文章页的侧栏目录也一起关闭了，右下角的悬浮目录按钮仍可用。测试：`astro check` 0 错误、Biome 通过；截图检查了首页 1440px、手机 390px 和文章页。
+
+## 阶段 8：左栏资料 + 站点信息（2026-11-23）
+
+| 文件 | 改动 | 原因 |
+| --- | --- | --- |
+| `src/config/sidebarConfig.ts` | `position` `both` → `left`；恢复个人资料；站点信息从右栏移到左栏、排在资料下方；两者 `position` 改为 `sticky`；移动端底部同样恢复资料和站点信息 | 用户要求。左栏整列随滚动固定，右侧文章列表单独滚动 |
+
+说明：站点信息沿用上游 `showOnPostPage: false`，文章页左栏只显示个人资料。测试：`type-check`、Biome 通过；截图检查了首页滚动前后、手机 390px、文章页。
+
+## 阶段 9：左栏站点信息换成日历（2026-11-23）
+
+| 文件 | 改动 | 原因 |
+| --- | --- | --- |
+| `src/config/sidebarConfig.ts` | 左栏：资料下方的站点信息换成日历（含年度热力图，`sticky`，文章页不显示）；站点信息退回右栏并保持关闭；移动端底部只保留个人资料 | 用户要求。移动端不放日历：上游 `Calendar.astro` 用固定 id，同页面只有一个实例能工作，桌面左栏那份已占用，底部那份会渲染成空白（已截图确认） |
+
+## 阶段 10：左栏加站点统计（2026-11-23）
+
+| 文件 | 改动 | 原因 |
+| --- | --- | --- |
+| `src/config/sidebarConfig.ts` | 站点统计从右栏移到左栏，位于个人资料和日历之间（`sticky`，文章页不显示，沿用上游设置）；移动端底部未加 | 用户要求 |
+
+说明：三张卡片总高度约 1150px，超过常见笔记本屏幕高度。上游的粘性定位会让左栏先跟着滚动一段，直到日历底部对齐窗口底部后再固定。1440×900 截图中日历底边贴着窗口下沿。
+
+后续调整（同日）：个人资料 `position` 改回 `top`。资料卡随页面滚走，统计卡滚到窗口顶部（导航栏显示时距顶 5.5rem，隐藏时 1rem）后与日历一起停住，不再出现「先跟着滚一段才停」的迟滞。统计 + 日历约 730px 高，窗口高度低于约 820px 时日历底部会被遮住一部分。截图确认 1440×900 下滚动多个位置时两张卡都停在顶部。
+
 ## 上线前必须处理（占位与遗留）
 
+- [ ] 全屏壁纸 `d1–d6` / `m1–m6`、文章封面和头像都是上游自带的游戏角色图，授权未确认。上线前换成自己有权使用的图片（`backgroundWallpaper.ts` 的 `src.desktop` / `src.mobile`）。
 - [ ] `siteConfig.site_url`、站点标题、导航栏标题、`profileConfig` 昵称 / GitHub / 邮箱：替换占位值。
 - [ ] `src/content/dynamic/` 中 4 条上游演示动态：该集合没有 `draft` 字段，**生产构建仍会显示**，上线前删除或替换为真实动态。
 - [ ] 头像 `src/assets/images/avatar.avif`、Logo 与 favicon 仍是上游素材，替换为原创或授权图片。
@@ -87,6 +142,6 @@ Projects、Blog（归档 / 分类 / 标签）、文章详情页沿用上游组�
 - [ ] `siteConfig` 中 Bilibili / Bangumi / VNDB / MAL 的账号仍是上游示例值；对应页面已关闭，启用前需改成自己的账号。
 - [ ] OG 默认图和 favicon 仍是上游 `firefly-light.png`（构建产物 `og:image`），替换为自己的图标。
 - [ ] `src/config/homeConfig.ts` 中的问候语、简介为占位；`hero.mottoEn` 是座右铭的参考英译，可自行修改。
-- [ ] 侧边栏「最新动态」组件与首页 Recent Notes 内容重复，可按需在 `sidebarConfig.ts` 关闭其一（本次未改）。
+- [x] 侧边栏「最新动态」组件与首页 Recent Notes 内容重复：阶段 7 已关闭全部侧栏组件和首页门户区。
 - [ ] `.github/workflows/deploy.yml` 推送 `master` 即自动部署 GitHub Pages，见 `DEPLOYMENT.md`。
 - [ ] 上线后用真实手机检查 390px 宽度，并跑一次 Lighthouse。

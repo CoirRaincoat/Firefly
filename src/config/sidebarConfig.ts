@@ -5,13 +5,15 @@ import type { SidebarLayoutConfig } from "../types/sidebarConfig";
  */
 export const sidebarLayoutConfig: SidebarLayoutConfig = {
 	// 是否启用侧边栏功能
+	// [custom] 左栏只保留个人资料和日历，其余组件和右栏全部关闭（阶段 7–9，见 CHANGELOG_CUSTOM.md）
 	enable: true,
 
 	// 侧边栏位置：
 	// left: 仅显示左侧边栏
 	// right: 仅显示右侧边栏
 	// both: 双侧边栏，1280px以上同时显示左右，769-1279px根据tabletSidebar配置显示其中一侧
-	position: "both",
+	// [custom] 左栏只放个人资料和日历，右栏组件全部关闭；文章列表占右侧
+	position: "left",
 
 	// 平板端(769-1279px)显示哪侧侧边栏，仅position为both时生效
 	// left: 平板端显示左侧边栏
@@ -40,9 +42,42 @@ export const sidebarLayoutConfig: SidebarLayoutConfig = {
 			// 是否启用该组件
 			enable: true,
 			// 组件位置
+			// [custom] 保持 top：资料卡随页面滚走；下方统计和日历（sticky）滚到顶部后停住。
+			// 三张都放 sticky 时总高度超过窗口，粘性容器会先跟着滚一段才停，显得迟钝
 			position: "top",
 			// 是否在文章详情页显示
 			showOnPostPage: true,
+		},
+		{
+			// 组件类型：站点统计组件
+			// [custom] 从右栏移到左栏，位于个人资料和日历之间
+			type: "stats",
+			// 是否启用该组件
+			enable: true,
+			// 组件位置
+			position: "sticky",
+			// 是否在文章详情页显示
+			showOnPostPage: false,
+		},
+		{
+			// 组件类型：日历组件
+			// [custom] 从右栏移到左栏，排在个人资料下方（替换原先移过来的站点信息）
+			type: "calendar",
+			// 是否启用该组件
+			enable: true,
+			// 是否显示组件标题
+			showTitle: false,
+			// 组件位置
+			position: "sticky",
+			// 是否在文章详情页显示
+			showOnPostPage: false,
+			// 组件专属配置
+			specificConfig: {
+				calendar: {
+					// 是否显示年度文章热力图
+					showHeatmap: true,
+				},
+			},
 		},
 		{
 			// 组件类型：公告组件
@@ -68,7 +103,7 @@ export const sidebarLayoutConfig: SidebarLayoutConfig = {
 			// 组件类型：分类组件
 			type: "categories",
 			// 是否启用该组件
-			enable: true,
+			enable: false, // [custom] 暂时去掉侧边卡片
 			// 组件位置
 			position: "sticky",
 			// 是否在文章详情页显示
@@ -83,7 +118,7 @@ export const sidebarLayoutConfig: SidebarLayoutConfig = {
 			// 组件类型：标签组件
 			type: "tags",
 			// 是否启用该组件
-			enable: true,
+			enable: false, // [custom] 暂时去掉侧边卡片
 			// 组件位置
 			position: "sticky",
 			// 是否在文章详情页显示
@@ -102,7 +137,7 @@ export const sidebarLayoutConfig: SidebarLayoutConfig = {
 			// 组件类型：最新动态组件
 			type: "dynamic",
 			// 是否启用该组件
-			enable: true,
+			enable: false, // [custom] 暂时去掉侧边卡片
 			// 组件位置
 			position: "top",
 			// 是否在文章详情页显示
@@ -116,20 +151,10 @@ export const sidebarLayoutConfig: SidebarLayoutConfig = {
 			},
 		},
 		{
-			// 组件类型：站点统计组件
-			type: "stats",
-			// 是否启用该组件
-			enable: true,
-			// 组件位置
-			position: "top",
-			// 是否在文章详情页显示
-			showOnPostPage: false,
-		},
-		{
 			// 组件类型：站点信息组件
 			type: "siteInfo",
 			// 是否启用该组件
-			enable: true,
+			enable: false, // [custom] 暂时去掉侧边卡片
 			// 组件位置
 			position: "top",
 			// 是否在文章详情页显示
@@ -143,29 +168,10 @@ export const sidebarLayoutConfig: SidebarLayoutConfig = {
 			},
 		},
 		{
-			// 组件类型：日历组件
-			type: "calendar",
-			// 是否启用该组件
-			enable: true,
-			// 是否显示组件标题
-			showTitle: false,
-			// 组件位置
-			position: "sticky",
-			// 是否在文章详情页显示
-			showOnPostPage: false,
-			// 组件专属配置
-			specificConfig: {
-				calendar: {
-					// 是否显示年度文章热力图
-					showHeatmap: true,
-				},
-			},
-		},
-		{
 			// 组件类型：侧边栏目录组件（只在文章详情页显示）
 			type: "sidebarToc",
 			// 是否启用该组件
-			enable: true,
+			enable: false, // [custom] 暂时去掉侧边卡片
 			// 组件位置
 			position: "sticky",
 			// 是否在文章详情页显示
@@ -237,7 +243,7 @@ export const sidebarLayoutConfig: SidebarLayoutConfig = {
 		{
 			// 组件类型：用户资料组件
 			type: "profile",
-			// 是否启用该组件
+			// 是否启用该组件（[custom] 与桌面左栏一致，保留资料和站点信息）
 			enable: true,
 			// 是否在文章详情页显示
 			showOnPostPage: true,
@@ -253,8 +259,8 @@ export const sidebarLayoutConfig: SidebarLayoutConfig = {
 		{
 			// 组件类型：分类组件
 			type: "categories",
-			// 是否启用该组件
-			enable: true,
+			// 是否启用该组件（[custom] 暂时去掉侧边卡片）
+			enable: false,
 			// 是否在文章详情页显示
 			showOnPostPage: true,
 			// 组件专属配置
@@ -266,8 +272,8 @@ export const sidebarLayoutConfig: SidebarLayoutConfig = {
 		{
 			// 组件类型：标签组件
 			type: "tags",
-			// 是否启用该组件
-			enable: true,
+			// 是否启用该组件（[custom] 暂时去掉侧边卡片）
+			enable: false,
 			// 是否在文章详情页显示
 			showOnPostPage: true,
 			// 组件专属配置
@@ -279,8 +285,8 @@ export const sidebarLayoutConfig: SidebarLayoutConfig = {
 		{
 			// 组件类型：最新动态组件
 			type: "dynamic",
-			// 是否启用该组件
-			enable: true,
+			// 是否启用该组件（[custom] 暂时去掉侧边卡片）
+			enable: false,
 			// 是否在文章详情页显示
 			showOnPostPage: true,
 			// 组件专属配置
@@ -294,16 +300,35 @@ export const sidebarLayoutConfig: SidebarLayoutConfig = {
 		{
 			// 组件类型：站点统计组件
 			type: "stats",
-			// 是否启用该组件
-			enable: true,
+			// 是否启用该组件（[custom] 暂时去掉侧边卡片）
+			enable: false,
 			// 是否在文章详情页显示
 			showOnPostPage: true,
 		},
 		{
+			// 组件类型：日历组件
+			// [custom] 移动端不启用：Calendar.astro 使用固定 id，同页面只能有一个实例生效，
+			// 桌面左栏的日历已占用，底部这份会渲染成空白
+			type: "calendar",
+			// 是否启用该组件
+			enable: false,
+			// 是否显示组件标题
+			showTitle: false,
+			// 是否在文章详情页显示
+			showOnPostPage: false,
+			// 组件专属配置
+			specificConfig: {
+				calendar: {
+					// 是否显示年度文章热力图
+					showHeatmap: true,
+				},
+			},
+		},
+		{
 			// 组件类型：站点信息组件
 			type: "siteInfo",
-			// 是否启用该组件
-			enable: true,
+			// 是否启用该组件（[custom] 暂时去掉侧边卡片）
+			enable: false,
 			// 是否在文章详情页显示
 			showOnPostPage: true,
 			// 组件专属配置

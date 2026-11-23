@@ -545,8 +545,14 @@
 
 		// 读取用户设置(localStorage 优先,缺省回退到配置默认值)
 		const storedEnabled = localStorage.getItem("sakuraEnabled");
+		// [custom] 用户没有在设置面板手动开启过时，系统开了「减少动态效果」就不显示樱花
+		const prefersReducedMotion = window.matchMedia(
+			"(prefers-reduced-motion: reduce)",
+		).matches;
 		const isEnabled =
-			storedEnabled !== null ? storedEnabled === "true" : sakuraConfig.enable;
+			storedEnabled !== null
+				? storedEnabled === "true"
+				: sakuraConfig.enable && !prefersReducedMotion;
 		const cfg: SakuraConfig = Object.assign({}, sakuraConfig, {
 			enable: isEnabled,
 		});

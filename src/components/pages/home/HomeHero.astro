@@ -1,24 +1,31 @@
 ---
-// [custom] 首页 Hero：问候、座右铭、简介、主操作按钮 + 原创终端风格 SVG 插画（无角色素材）
+// [custom] 首页自我介绍卡片：问候、简介、主操作按钮 + 原创樱花 SVG 装饰（无角色素材）
+// 首屏的大标题与座右铭由全屏壁纸横幅显示（backgroundWallpaper.common.homeText），这里不重复
 import { Icon } from "astro-icon/components";
 import { profileConfig } from "@/config";
 import { homeConfig } from "@/config/homeConfig";
 import { url } from "@/utils/url-utils";
 
 const { hero } = homeConfig;
-const greeting = hero.greeting.replace("{name}", profileConfig.name);
+// 问候语拆成「名字前 / 名字后」两段，名字单独上色
+const [before = "", ...rest] = hero.greeting.split("{name}");
+const hasName = rest.length > 0;
+const greetingParts = [before, rest.join(profileConfig.name)];
+
+// 五瓣樱花：每片花瓣绕中心旋转 72°
+const petalAngles = [0, 72, 144, 216, 288];
 ---
 
 <section class="home-hero card-base onload-animation" aria-labelledby="home-hero-title">
 	<div class="home-hero-text">
 		<p class="home-hero-kicker">
-			<Icon name="material-symbols:terminal-rounded" aria-hidden="true" />
-			<span>~/ welcome</span>
+			<Icon name="material-symbols:local-florist-outline-rounded" aria-hidden="true" />
+			<span>Welcome</span>
 		</p>
 		<!-- 页面已有隐藏的 h1（站点标题，见 [...page].astro），这里用 h2 避免重复 h1 -->
-		<h2 id="home-hero-title">{greeting}</h2>
-		<p class="home-hero-motto" lang="zh-CN">{hero.motto}</p>
-		<p class="home-hero-motto-en" lang="en">{hero.mottoEn}</p>
+		<h2 id="home-hero-title">
+			{greetingParts[0]}{hasName && <span class="home-hero-name">{profileConfig.name}</span>}{greetingParts[1]}
+		</h2>
 		<p class="home-hero-intro">{hero.intro}</p>
 		<div class="home-hero-actions">
 			{
@@ -35,108 +42,100 @@ const greeting = hero.greeting.replace("{name}", profileConfig.name);
 		</div>
 	</div>
 
-	<!-- 原创装饰插画：终端窗口 + 几何图形，纯 SVG，颜色取主题变量 -->
+	<!-- 原创装饰：三朵樱花 + 光斑，纯 SVG，颜色取主题令牌 -->
 	<div class="home-hero-art" aria-hidden="true">
-		<svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg" focusable="false">
-			<circle class="art-orb art-orb-a" cx="262" cy="44" r="34"></circle>
-			<circle class="art-orb art-orb-b" cx="46" cy="204" r="22"></circle>
-			<rect class="art-diamond" x="268" y="168" width="22" height="22" rx="4" transform="rotate(45 279 179)"></rect>
+		<svg viewBox="0 0 280 220" xmlns="http://www.w3.org/2000/svg" focusable="false">
+			<defs>
+				<path id="home-petal" d="M0 0C-14 -10 -16 -32 -6 -44L0 -38L6 -44C16 -32 14 -10 0 0Z"></path>
+				<g id="home-flower">
+					{petalAngles.map((a) => <use href="#home-petal" transform={`rotate(${a})`} />)}
+					<circle r="6" class="art-core"></circle>
+				</g>
+			</defs>
 
-			<g class="art-window">
-				<rect x="34" y="40" width="248" height="164" rx="14" class="art-frame"></rect>
-				<path d="M34 54a14 14 0 0 1 14-14h220a14 14 0 0 1 14 14v12H34z" class="art-bar"></path>
-				<circle cx="54" cy="53" r="4.5" class="art-dot art-dot-1"></circle>
-				<circle cx="70" cy="53" r="4.5" class="art-dot art-dot-2"></circle>
-				<circle cx="86" cy="53" r="4.5" class="art-dot art-dot-3"></circle>
+			<circle class="art-glow art-glow-a" cx="196" cy="70" r="58"></circle>
+			<circle class="art-glow art-glow-b" cx="70" cy="160" r="40"></circle>
 
-				<text x="52" y="94" class="art-code art-prompt">$</text>
-				<rect x="66" y="86" width="96" height="9" rx="4.5" class="art-line art-line-teal"></rect>
-				<rect x="52" y="108" width="140" height="9" rx="4.5" class="art-line"></rect>
-				<rect x="68" y="126" width="72" height="9" rx="4.5" class="art-line art-line-lavender"></rect>
-				<rect x="148" y="126" width="56" height="9" rx="4.5" class="art-line"></rect>
-				<rect x="68" y="144" width="112" height="9" rx="4.5" class="art-line art-line-blue"></rect>
-				<rect x="52" y="162" width="88" height="9" rx="4.5" class="art-line"></rect>
-				<text x="52" y="190" class="art-code art-prompt">$</text>
-				<rect x="66" y="181" width="9" height="12" rx="2" class="art-cursor"></rect>
+			<g class="art-flower art-flower-a" transform="translate(150 104) scale(1.35)">
+				<use href="#home-flower" class="art-sway"></use>
 			</g>
+			<g class="art-flower art-flower-b" transform="translate(232 168) scale(0.8) rotate(18)">
+				<use href="#home-flower"></use>
+			</g>
+			<g class="art-flower art-flower-c" transform="translate(56 58) scale(0.62) rotate(-12)">
+				<use href="#home-flower"></use>
+			</g>
+
+			<use href="#home-petal" class="art-loose" transform="translate(96 196) rotate(120) scale(0.45)"></use>
+			<use href="#home-petal" class="art-loose" transform="translate(250 34) rotate(-40) scale(0.38)"></use>
 		</svg>
 	</div>
 </section>
 
 <style>
 	.home-hero {
-		position: relative;
 		display: grid;
-		grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+		grid-template-columns: minmax(0, 1fr) 9.5rem;
 		align-items: center;
 		gap: 1.5rem;
-		padding: 2rem 2.25rem;
-		/* 亮色浅青底块，暗色下为极淡青色叠加 */
-		background:
-			radial-gradient(120% 140% at 100% 0%, var(--brand-soft) 0%, transparent 60%),
-			var(--card-bg);
+		padding: 3rem 2.75rem;
+		background-image: radial-gradient(
+			120% 140% at 100% 0%,
+			var(--brand-soft) 0%,
+			transparent 60%
+		);
 	}
 
 	.home-hero-kicker {
 		display: inline-flex;
 		align-items: center;
 		gap: 0.375rem;
-		margin: 0 0 0.75rem;
-		padding: 0.2rem 0.65rem;
+		margin: 0 0 1rem;
+		padding: 0.25rem 0.8rem;
 		border-radius: var(--radius-full);
-		font-family: var(--font-code, ui-monospace, monospace);
 		font-size: 0.8rem;
+		font-weight: 600;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
 		color: var(--btn-content);
 		background: var(--btn-regular-bg);
 	}
 
 	h2 {
 		margin: 0;
-		font-size: clamp(1.75rem, 1.2rem + 2vw, 2.5rem);
+		font-size: clamp(1.875rem, 1.2rem + 2.4vw, 2.75rem);
 		line-height: 1.2;
 		font-weight: 800;
 		color: var(--deep-text);
 	}
 
-	.home-hero-motto {
-		margin: 0.75rem 0 0;
-		font-size: 1.125rem;
-		font-weight: 600;
-		letter-spacing: 0.05em;
-		background: var(--brand-gradient);
-		-webkit-background-clip: text;
-		background-clip: text;
-		color: transparent;
-	}
-
-	.home-hero-motto-en {
-		margin: 0.25rem 0 0;
-		font-size: 0.875rem;
-		font-style: italic;
-		color: var(--content-meta);
+	/* 名字用主题色；不用渐变文字，保证半透明卡片上的对比度 */
+	.home-hero-name {
+		color: var(--brand-rose);
 	}
 
 	.home-hero-intro {
-		margin: 1rem 0 0;
-		max-width: 36rem;
-		line-height: 1.7;
+		margin: 1.25rem 0 0;
+		max-width: 38rem;
+		font-size: 1.05rem;
+		line-height: 1.8;
 		color: var(--brand-text-muted);
 	}
 
 	.home-hero-actions {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 0.625rem;
-		margin-top: 1.5rem;
+		gap: 0.75rem;
+		margin-top: 2rem;
 	}
 
 	.home-hero-btn {
 		display: inline-flex;
 		align-items: center;
-		gap: 0.375rem;
-		min-height: 2.5rem;
-		padding: 0 1rem;
-		border-radius: var(--radius-xl);
+		gap: 0.4rem;
+		min-height: 2.75rem;
+		padding: 0 1.1rem;
+		border-radius: var(--radius-full);
 		border: 1px solid var(--line-color);
 		font-size: 0.9rem;
 		font-weight: 600;
@@ -173,95 +172,63 @@ const greeting = hero.greeting.replace("{name}", profileConfig.name);
 		transform: none;
 	}
 
-	/* ===== 插画 ===== */
+	/* ===== 樱花装饰 ===== */
 	.home-hero-art svg {
 		display: block;
 		width: 100%;
-		max-width: 22rem;
+		max-width: 20rem;
 		height: auto;
 		margin-inline: auto;
+		overflow: visible;
 	}
 
-	.art-orb-a {
-		fill: var(--brand-teal);
-		opacity: 0.22;
+	.art-glow-a {
+		fill: var(--brand-pink);
+		opacity: 0.18;
 	}
 
-	.art-orb-b {
+	.art-glow-b {
+		fill: var(--brand-sky);
+		opacity: 0.2;
+	}
+
+	.art-flower {
+		fill: var(--brand-pink);
+	}
+
+	.art-flower-b {
 		fill: var(--brand-lavender);
-		opacity: 0.25;
+		opacity: 0.85;
 	}
 
-	.art-diamond {
-		fill: none;
-		stroke: var(--brand-blue);
-		stroke-width: 2.5;
+	.art-flower-c {
+		fill: var(--brand-rose);
+		opacity: 0.7;
+	}
+
+	.art-core {
+		fill: #fff5c2;
+	}
+
+	.art-loose {
+		fill: var(--brand-pink);
 		opacity: 0.6;
 	}
 
-	.art-frame {
-		fill: var(--codeblock-bg);
-		stroke: var(--line-color);
+	/* 花朵中心在局部坐标原点，绕原点缓慢摆动 */
+	.art-sway {
+		transform-origin: 0 0;
+		animation: home-hero-sway 6s ease-in-out infinite alternate;
 	}
 
-	.art-bar {
-		fill: var(--codeblock-topbar-bg);
-	}
-
-	.art-dot-1 {
-		fill: #f7768e;
-	}
-
-	.art-dot-2 {
-		fill: #e0af68;
-	}
-
-	.art-dot-3 {
-		fill: #9ece6a;
-	}
-
-	.art-code {
-		font-family: var(--font-code, ui-monospace, monospace);
-		font-size: 13px;
-		font-weight: 700;
-	}
-
-	.art-prompt {
-		fill: var(--brand-teal);
-	}
-
-	.art-line {
-		fill: rgb(169 177 214 / 0.28);
-	}
-
-	.art-line-teal {
-		fill: var(--brand-teal);
-		opacity: 0.85;
-	}
-
-	.art-line-lavender {
-		fill: var(--brand-lavender);
-		opacity: 0.85;
-	}
-
-	.art-line-blue {
-		fill: var(--brand-blue);
-		opacity: 0.85;
-	}
-
-	.art-cursor {
-		fill: var(--brand-teal);
-		animation: home-hero-blink 1.1s steps(1) infinite;
-	}
-
-	@keyframes home-hero-blink {
-		50% {
-			opacity: 0;
+	@keyframes home-hero-sway {
+		to {
+			transform: rotate(12deg);
 		}
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.art-cursor {
+		.art-sway {
 			animation: none;
 		}
 
@@ -276,7 +243,8 @@ const greeting = hero.greeting.replace("{name}", profileConfig.name);
 	@media (max-width: 1023px) {
 		.home-hero {
 			grid-template-columns: minmax(0, 1fr);
-			padding: 1.75rem 1.5rem;
+			gap: 1.5rem;
+			padding: 2.25rem 2rem;
 		}
 
 		.home-hero-art {
@@ -284,13 +252,13 @@ const greeting = hero.greeting.replace("{name}", profileConfig.name);
 		}
 
 		.home-hero-art svg {
-			max-width: 15rem;
+			max-width: 13rem;
 		}
 	}
 
 	@media (max-width: 480px) {
 		.home-hero {
-			padding: 1.25rem 1rem;
+			padding: 1.75rem 1.25rem;
 		}
 
 		.home-hero-art {

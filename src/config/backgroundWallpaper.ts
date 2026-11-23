@@ -1,9 +1,11 @@
 import type { BackgroundWallpaperConfig } from "@/types/backgroundWallpaper";
+import { homeConfig } from "./homeConfig";
 
 export const backgroundWallpaper: BackgroundWallpaperConfig = {
 	// 壁纸模式："banner" 横幅壁纸，"fullscreen" 全屏壁纸，"overlay" 覆盖透明，"none" 纯色背景无壁纸
-	// [custom] 上游示例壁纸是现成动漫角色图，按任务书不作为主视觉，先用纯色背景；首页 Hero 在阶段 3 实现
-	mode: "none",
+	// [custom] 全屏壁纸首屏 + 下方内容卡片毛玻璃（见 fullscreen.layout = "hero"）。
+	// 目前使用上游自带 d1-d6 / m1-m6 示例壁纸（游戏角色图，授权需自行确认），上线前建议换成自己的图片
+	mode: "fullscreen",
 	// 是否启用背景视频播放，配置后将在导航栏显示视频播放按钮（[custom] 不使用背景视频）
 	playerEnable: false,
 	/**
@@ -74,18 +76,13 @@ export const backgroundWallpaper: BackgroundWallpaperConfig = {
 			// 是否启用主页横幅文字
 			enable: true,
 			// 主页横幅主标题
-			title: "Lovely firefly!",
+			// [custom] TODO 占位：替换为你的昵称或站点名
+			title: "Personal Digital Space",
 			// 主页横幅主标题字体大小
 			titleSize: "4.5rem",
 			// 主页横幅副标题
-			subtitle: [
-				"In Reddened Chrysalis, I Once Rest",
-				"From Shattered Sky, I Free Fall",
-				"Amidst Silenced Stars, I Deep Sleep",
-				"Upon Lighted Fyrefly, I Soon Gaze",
-				"From Undreamt Night, I Thence Shine",
-				"In Finalized Morrow, I Full Bloom",
-			],
+			// [custom] 座右铭（中 / 英），文字集中在 homeConfig.hero 中维护
+			subtitle: [homeConfig.hero.motto, homeConfig.hero.mottoEn],
 			// 主页横幅副标题字体大小
 			subtitleSize: "1.5rem",
 			typewriter: {
@@ -104,22 +101,18 @@ export const backgroundWallpaper: BackgroundWallpaperConfig = {
 			linksEnable: true,
 			// 首页横幅标题下方的链接图标（可选，支持 showName 显示文字）
 			// 图标支持 Iconify 格式：fa7-brands:github、fa7-solid:envelope、mdi:rss 等
+			// [custom] 移除上游作者的 GitHub / 邮箱 / 赞助链接，改为占位（与 profileConfig 一致）
 			links: [
 				{
 					name: "GitHub",
 					icon: "fa7-brands:github",
-					url: "https://github.com/CuteLeaf/Firefly",
+					url: "https://github.com/your-username",
 					showName: true,
 				},
 				{
 					name: "Email",
 					icon: "fa7-solid:envelope",
-					url: "mailto:xiaye@msn.com",
-				},
-				{
-					name: "Sponsor",
-					icon: "material-symbols:favorite",
-					url: "https://blog.cuteleaf.cn/sponsor/",
+					url: "mailto:you@example.com",
 				},
 				{
 					name: "RSS",
@@ -193,7 +186,8 @@ export const backgroundWallpaper: BackgroundWallpaperConfig = {
 	// 背景透明度(opacity)不适用（全屏壁纸不透明）；导航栏透明模式由 fullscreen.navbar.transparentMode 控制，脱离 banner 的 navbar 配置
 	fullscreen: {
 		// 布局模式："classic" 经典文档流全屏壁纸，"hero" 固定全屏首屏壁纸
-		layout: "classic",
+		// [custom] hero：壁纸固定在背景，内容卡片半透明叠在逐渐模糊的壁纸上，形成毛玻璃效果
+		layout: "hero",
 		// 图片位置
 		position: "center",
 		// 全屏壁纸模式的导航栏配置
