@@ -65,6 +65,16 @@ export const fontsList: FontDefinition[] = [
 			"monospace",
 		],
 	},
+	// [custom] 首页横幅标题「Somewhere Among the Stars」的凯尔特手抄本风格字体（仅 latin 子集）
+	{
+		name: "Uncial Antiqua",
+		cssVariable: "--font-uncial-antiqua",
+		provider: "fontsource",
+		weights: ["400"],
+		styles: ["normal"],
+		subsets: ["latin"],
+		fallbacks: ["Cormorant Garamond", "Georgia", "serif"],
+	},
 	// ─── 本地字体示例 ───
 	// 使用步骤：
 	// 1. 将 TTF/OTF/WOFF2 字体文件放在 public/assets/fonts/ 目录下
@@ -96,7 +106,8 @@ export const fontConfig: FontSelectionConfig = {
 	// 各区域独立字体设置（填写上方 fonts 中的 cssVariable，留空则使用全局 selected 字体）
 	// 例如：bannerTitleFont: "--font-inter", 表示主页横幅主标题使用 Inter 字体
 	// 主页横幅主标题字体
-	bannerTitleFont: "--font-zen-maru-gothic",
+	// [custom] Zen Maru Gothic → Uncial Antiqua，配合 CelticTitle 组件
+	bannerTitleFont: "--font-uncial-antiqua",
 	// 主页横幅副标题字体
 	bannerSubtitleFont: "--font-inter",
 	// 导航栏标题字体

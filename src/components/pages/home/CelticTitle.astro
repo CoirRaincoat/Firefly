@@ -1,0 +1,439 @@
+---
+/**
+ * [custom] 首页横幅标题：凯尔特星辰（Celtic Astral）
+ *
+ * - 标题是真实文本，首字母只是包了一层 span，读屏与搜索引擎读到的仍是完整标题
+ * - 装饰全部是内联 SVG：环绕星轨、流光、四角星芒、首字母交织纹、三结纹分隔线
+ * - 动效只用 CSS：入场 1.6s；之后只有流光、星芒与三结纹做低频循环，标题主体静止
+ * - prefers-reduced-motion 时关闭全部动画，保留静态标题与装饰
+ *
+ * 星轨是 1000×300 视图框里的椭圆（中心 500,150，半径 490×140），从最左点顺时针绕行。
+ * 轨道上的星点位置与 flare 延迟由弧长比例算出：流光经过时星点闪一下。
+ * 流光周期 ORBIT_SECONDS，星点 delay = -((0.08 - 弧长比例) mod 1) × 周期。
+ */
+
+interface Props {
+	text: string;
+	/** 标题字号上限，如 "4.25rem"；窄屏会按视口自动缩小 */
+	size?: string;
+}
+
+const { text, size = "4.25rem" } = Astro.props;
+
+const chars = Array.from(text);
+const initial = chars[0] ?? "";
+const rest = chars.slice(1).join("");
+
+const ORBIT_SECONDS = 14;
+const ORBIT_PATH =
+	"M10 150 A490 140 0 1 1 990 150 A490 140 0 1 1 10 150";
+
+// 轨道上的星点：x/y 为相对星轨框的百分比，frac 为该点在轨道上的弧长比例
+const orbitStars = [
+	{ x: 25.06, y: 9.83, frac: 0.1327, s: 1 },
+	{ x: 65.14, y: 5.62, frac: 0.321, s: 0.8 },
+	{ x: 98.13, y: 41.26, frac: 0.4869, s: 0.9 },
+	{ x: 62.19, y: 95.2, frac: 0.6929, s: 0.75 },
+	{ x: 21.2, y: 87.75, frac: 0.8857, s: 0.85 },
+].map((star) => {
+	const phase = (((0.08 - star.frac) % 1) + 1) % 1;
+	return { ...star, delay: -(phase * ORBIT_SECONDS).toFixed(2) };
+});
+
+// 轨道外独立闪烁的小星点
+const twinkleStars = [
+	{ x: 6, y: 24, s: 0.55, dur: 4.6, delay: -1.2 },
+	{ x: 88, y: 20, s: 0.5, dur: 5.8, delay: -3.4 },
+	{ x: 44, y: 100, s: 0.45, dur: 6.6, delay: -2.1 },
+];
+
+// 三结纹：三个透镜（两圆相交）各绕中心旋转 120°，见 CHANGELOG_CUSTOM.md 阶段 12
+const LENS = "M75.98 35 A26.46 26.46 0 0 1 41.34 55 A26.46 26.46 0 0 1 75.98 35 Z";
+const STAR = "M0-10C.8-2 2-.8 10 0C2 .8.8 2 0 10C-.8 2-2 .8-10 0C-2-.8-.8-2 0-10Z";
+---
+
+<div class="celtic-title" style={`--ct-size: ${size}; --ct-orbit: ${ORBIT_SECONDS}s`}>
+	<div class="ct-stage">
+		<span class="ct-deco" aria-hidden="true">
+			<svg class="ct-orbit" viewBox="0 0 1000 300" preserveAspectRatio="none" focusable="false">
+				<defs>
+					<linearGradient id="ct-track-grad" x1="0" x2="1" y1="0" y2="0">
+						<stop offset="0" stop-color="#f7f1e3" stop-opacity="0"></stop>
+						<stop offset="0.2" stop-color="#f7f1e3" stop-opacity="0.4"></stop>
+						<stop offset="0.8" stop-color="#c4b5f2" stop-opacity="0.4"></stop>
+						<stop offset="1" stop-color="#c4b5f2" stop-opacity="0"></stop>
+					</linearGradient>
+					<linearGradient id="ct-light-grad" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="300">
+						<stop offset="0" stop-color="#e8d29c"></stop>
+						<stop offset="0.5" stop-color="#b9c8f4"></stop>
+						<stop offset="1" stop-color="#c4b0f0"></stop>
+					</linearGradient>
+				</defs>
+				<path class="ct-orbit-track" d={ORBIT_PATH} pathLength="1000"></path>
+				<path class="ct-orbit-light ct-orbit-light-halo" d={ORBIT_PATH} pathLength="1000"></path>
+				<path class="ct-orbit-light" d={ORBIT_PATH} pathLength="1000"></path>
+			</svg>
+			{
+				orbitStars.map((star) => (
+					<svg
+						class="ct-star ct-star-orbit"
+						viewBox="-10 -10 20 20"
+						focusable="false"
+						style={`--x: ${star.x}%; --y: ${star.y}%; --s: ${star.s}; animation-delay: ${star.delay}s`}
+					>
+						<path d={STAR} />
+					</svg>
+				))
+			}
+			{
+				twinkleStars.map((star) => (
+					<svg
+						class="ct-star ct-star-twinkle"
+						viewBox="-10 -10 20 20"
+						focusable="false"
+						style={`--x: ${star.x}%; --y: ${star.y}%; --s: ${star.s}; animation-duration: ${star.dur}s; animation-delay: ${star.delay}s`}
+					>
+						<path d={STAR} />
+					</svg>
+				))
+			}
+		</span>
+
+		<div class="ct-text">
+			<span class="ct-initial">{initial}<svg class="ct-knot" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+					<circle cx="50" cy="50" r="46"></circle>
+					<circle cx="50" cy="50" r="41.5" class="ct-knot-inner"></circle>
+					<g class="ct-knot-tri">
+						<path d={LENS}></path>
+						<path d={LENS} transform="rotate(120 50 50)"></path>
+						<path d={LENS} transform="rotate(240 50 50)"></path>
+					</g>
+				</svg></span>{rest}
+		</div>
+	</div>
+
+	<svg class="ct-divider" viewBox="0 0 400 24" aria-hidden="true" focusable="false">
+		<defs>
+			<!-- 水平线的包围盒高度为 0，渐变必须用 userSpaceOnUse，否则不渲染 -->
+			<linearGradient id="ct-rule-left" gradientUnits="userSpaceOnUse" x1="24" x2="168" y1="0" y2="0">
+				<stop offset="0" stop-color="#e8d29c" stop-opacity="0"></stop>
+				<stop offset="1" stop-color="#e8d29c" stop-opacity="0.85"></stop>
+			</linearGradient>
+			<linearGradient id="ct-rule-right" gradientUnits="userSpaceOnUse" x1="232" x2="376" y1="0" y2="0">
+				<stop offset="0" stop-color="#c4b5f2" stop-opacity="0.85"></stop>
+				<stop offset="1" stop-color="#c4b5f2" stop-opacity="0"></stop>
+			</linearGradient>
+		</defs>
+		<line x1="24" y1="12" x2="168" y2="12" stroke="url(#ct-rule-left)"></line>
+		<line x1="232" y1="12" x2="376" y2="12" stroke="url(#ct-rule-right)"></line>
+		<path d={STAR} transform="translate(178 12) scale(0.32)" class="ct-divider-star"></path>
+		<path d={STAR} transform="translate(222 12) scale(0.32)" class="ct-divider-star"></path>
+		<g class="ct-divider-tri" transform="translate(188 0) scale(0.24)">
+			<circle cx="50" cy="50" r="38"></circle>
+			<path d={LENS}></path>
+			<path d={LENS} transform="rotate(120 50 50)"></path>
+			<path d={LENS} transform="rotate(240 50 50)"></path>
+		</g>
+	</svg>
+</div>
+<style>
+	.celtic-title {
+		--ct-ivory: #f7f1e3;
+		--ct-gold: #dcc48e;
+		--ct-blue: #a8c2f2;
+		--ct-lavender: #c4b5f2;
+		/* 文字光晕：一层极淡蓝紫外发光 + 一层贴字暗影保证浅色壁纸上可读 */
+		--ct-glow: drop-shadow(0 0 0.16em rgb(168 176 242 / 0.5))
+			drop-shadow(0 0.03em 0.06em rgb(28 22 54 / 0.5));
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		margin-bottom: 0.75rem;
+	}
+
+	.ct-stage {
+		position: relative;
+		max-width: 100%;
+		padding: 0.5em 0.95em;
+		/* 桌面端按 3.6vw 缩放，单行放进横幅文字区（75% 宽） */
+		font-size: clamp(2rem, 5.1vw, var(--ct-size, 4.25rem));
+	}
+
+	@media (min-width: 1200px) {
+		.ct-stage {
+			font-size: min(3.6vw, var(--ct-size, 4.25rem));
+		}
+	}
+
+	/* ===== 标题文字 ===== */
+	.ct-text {
+		position: relative;
+		font-family: var(--font-banner-title, "Uncial Antiqua"), "Cormorant Garamond", Georgia, serif;
+		font-weight: 400;
+		line-height: 1.2;
+		letter-spacing: 0.015em;
+		text-align: center;
+		text-wrap: balance;
+		color: var(--ct-ivory);
+		/* 每行重复一次的象牙白 → 淡金竖向渐变 */
+		background: linear-gradient(180deg, #fffbf2 0%, #f5ecd6 55%, #dcc48e 100%) 0 0 / 100% 1.2em repeat-y;
+		-webkit-background-clip: text;
+		background-clip: text;
+		-webkit-text-fill-color: transparent;
+		filter: var(--ct-glow);
+		animation: ct-reveal 1.6s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+	}
+
+	/* 首字母 S：放大、偏金色，背后衬一圈交织纹 */
+	.ct-initial {
+		position: relative;
+		font-size: 1.32em;
+		line-height: 1;
+		padding-inline: 0.04em 0.02em;
+		background: linear-gradient(165deg, #fff6dc 0%, #e6cf98 48%, #bfaeea 100%);
+		-webkit-background-clip: text;
+		background-clip: text;
+		-webkit-text-fill-color: transparent;
+	}
+
+	.ct-knot {
+		position: absolute;
+		left: 50%;
+		top: 54%;
+		z-index: -1;
+		width: 1.15em;
+		height: 1.15em;
+		translate: -50% -50%;
+		overflow: visible;
+		fill: none;
+		stroke: var(--ct-gold);
+		stroke-width: 1.4;
+		opacity: 0;
+		animation: ct-knot-in 1.4s ease-out 1.1s forwards;
+	}
+
+	.ct-knot-inner {
+		stroke: var(--ct-lavender);
+		stroke-width: 0.8;
+		stroke-dasharray: 2 3;
+	}
+
+	.ct-knot-tri {
+		stroke: var(--ct-blue);
+		stroke-width: 1;
+		opacity: 0.45;
+	}
+
+	/* ===== 星轨与星点 ===== */
+	.ct-deco {
+		position: absolute;
+		inset: 0;
+		pointer-events: none;
+		animation: ct-fade 1.4s ease-out 0.8s both;
+	}
+
+	.ct-orbit {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		overflow: visible;
+		fill: none;
+	}
+
+	.ct-orbit path {
+		vector-effect: non-scaling-stroke;
+	}
+
+	.ct-orbit-track {
+		stroke: url(#ct-track-grad);
+		stroke-width: 1;
+	}
+
+	/* 流光：一段短虚线沿椭圆匀速绕行；halo 是同步的宽而淡的一层，代替滤镜模糊 */
+	.ct-orbit-light {
+		stroke: url(#ct-light-grad);
+		stroke-width: 1.6;
+		stroke-linecap: round;
+		stroke-dasharray: 70 930;
+		animation: ct-orbit var(--ct-orbit) linear infinite;
+	}
+
+	.ct-orbit-light-halo {
+		stroke-width: 6;
+		opacity: 0.22;
+	}
+
+	.ct-star {
+		position: absolute;
+		left: var(--x);
+		top: var(--y);
+		width: calc(0.26em * var(--s));
+		height: calc(0.26em * var(--s));
+		translate: -50% -50%;
+		overflow: visible;
+		fill: var(--ct-ivory);
+		filter: drop-shadow(0 0 0.06em rgb(232 210 156 / 0.9));
+	}
+
+	.ct-star-orbit {
+		opacity: 0.55;
+		animation: ct-flare var(--ct-orbit) ease-in-out infinite;
+	}
+
+	.ct-star-twinkle {
+		fill: var(--ct-blue);
+		opacity: 0.3;
+		animation: ct-twinkle 5s ease-in-out infinite;
+	}
+
+	/* ===== 分隔线 ===== */
+	.ct-divider {
+		display: block;
+		width: clamp(11rem, 34vw, 24rem);
+		height: auto;
+		margin-top: 0.1rem;
+		overflow: visible;
+		transform-origin: center;
+		filter: drop-shadow(0 0 2px rgb(28 22 54 / 0.35));
+		animation: ct-divider-in 1.2s cubic-bezier(0.2, 0.7, 0.2, 1) 1s both;
+	}
+
+	.ct-divider line {
+		stroke-width: 1;
+	}
+
+	.ct-divider-star {
+		fill: var(--ct-gold);
+	}
+
+	.ct-divider-tri {
+		fill: none;
+		stroke: var(--ct-gold);
+		stroke-width: 1;
+		animation: ct-breathe 6s ease-in-out 2.4s infinite;
+	}
+
+	.ct-divider-tri * {
+		vector-effect: non-scaling-stroke;
+	}
+
+	.ct-divider-tri circle {
+		stroke: var(--ct-lavender);
+		opacity: 0.7;
+	}
+
+	/* 宽屏单行显示（Uncial 整句较宽，1200px 以下允许自然换行） */
+	@media (min-width: 1200px) {
+		.ct-text {
+			white-space: nowrap;
+		}
+	}
+
+	/* ===== 关键帧 ===== */
+	@keyframes ct-reveal {
+		from {
+			opacity: 0;
+			filter: blur(10px) var(--ct-glow);
+			transform: translateY(0.22em);
+		}
+		to {
+			opacity: 1;
+			filter: blur(0) var(--ct-glow);
+			transform: none;
+		}
+	}
+
+	@keyframes ct-fade {
+		from {
+			opacity: 0;
+		}
+	}
+
+	@keyframes ct-knot-in {
+		from {
+			opacity: 0;
+			scale: 0.8;
+			rotate: -30deg;
+		}
+		to {
+			opacity: 0.85;
+			scale: 1;
+			rotate: 0deg;
+		}
+	}
+
+	@keyframes ct-orbit {
+		from {
+			stroke-dashoffset: 1000;
+		}
+		to {
+			stroke-dashoffset: 0;
+		}
+	}
+
+	/* 4% 处是流光经过的时刻（与 frontmatter 里的 delay 计算对应） */
+	@keyframes ct-flare {
+		0%,
+		12%,
+		100% {
+			opacity: 0.55;
+			scale: 1;
+			rotate: 0deg;
+		}
+		4% {
+			opacity: 1;
+			scale: 1.9;
+			rotate: 45deg;
+		}
+	}
+
+	@keyframes ct-twinkle {
+		0%,
+		100% {
+			opacity: 0.25;
+			scale: 0.8;
+		}
+		50% {
+			opacity: 0.85;
+			scale: 1;
+		}
+	}
+
+	@keyframes ct-divider-in {
+		from {
+			opacity: 0;
+			transform: scaleX(0.2);
+		}
+	}
+
+	@keyframes ct-breathe {
+		0%,
+		100% {
+			opacity: 0.75;
+		}
+		50% {
+			opacity: 1;
+		}
+	}
+
+	/* ===== 减少动态效果：全部静止，保留标题与装饰 ===== */
+	@media (prefers-reduced-motion: reduce) {
+		.ct-text,
+		.ct-deco,
+		.ct-knot,
+		.ct-divider,
+		.ct-divider-tri,
+		.ct-star {
+			animation: none;
+		}
+
+		.ct-knot {
+			opacity: 0.85;
+		}
+
+		.ct-orbit-light {
+			display: none;
+		}
+	}
+</style>

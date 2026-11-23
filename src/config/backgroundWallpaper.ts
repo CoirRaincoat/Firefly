@@ -76,10 +76,10 @@ export const backgroundWallpaper: BackgroundWallpaperConfig = {
 			// 是否启用主页横幅文字
 			enable: true,
 			// 主页横幅主标题
-			// [custom] TODO 占位：替换为你的昵称或站点名
-			title: "Personal Digital Space",
-			// 主页横幅主标题字体大小
-			titleSize: "4.5rem",
+			// [custom] 由 CelticTitle 组件渲染为凯尔特星辰风格标题（见 BannerHomeTextOverlay.astro）
+			title: "Somewhere Among the Stars",
+			// 主页横幅主标题字体大小（CelticTitle 中作为上限，窄屏自动缩小）
+			titleSize: "4.25rem",
 			// 主页横幅副标题
 			// [custom] 座右铭（中 / 英），文字集中在 homeConfig.hero 中维护
 			subtitle: [homeConfig.hero.motto, homeConfig.hero.mottoEn],

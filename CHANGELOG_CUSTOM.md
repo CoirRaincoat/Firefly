@@ -144,6 +144,25 @@ Projects、Blog（归档 / 分类 / 标签）、文章详情页沿用上游组�
 
 测试：`type-check`、`astro check`（0 错误）、Biome 通过；截图确认文章页信息栏和左栏统计卡显示占位，首页文章卡片不显示。
 
+## 阶段 12：首屏标题「Somewhere Among the Stars」凯尔特星辰效果（2026-11-23）
+
+| 文件 | 改动 | 原因 |
+| --- | --- | --- |
+| `src/components/pages/home/CelticTitle.astro`（新增） | 真实文本标题 + 内联 SVG 装饰（椭圆星轨、沿轨道移动的金紫流光、轨道星芒、独立闪烁小星、首字母 S 背后的圆环与三结纹、三结纹分隔线）+ 纯 CSS 动效 | 任务要求；不引入动画库，不用位图 |
+| `src/components/layout/BannerHomeTextOverlay.astro` | 主标题由 `.banner-title` 纯文字改为渲染 `CelticTitle` | **上游组件改动**：横幅标题没有插槽，只能在这里替换；副标题、链接按钮不变 |
+| `src/config/fontConfig.ts` | 新增 Uncial Antiqua（fontsource，仅 latin、400）；`bannerTitleFont` 改为它 | 沿用上游 Astro Font API 加载方式。原 Zen Maru Gothic 不再被引用，也就不再加载 |
+| `src/config/backgroundWallpaper.ts` | `homeText.title` 改为 `Somewhere Among the Stars`，`titleSize` 4.25rem | 标题文字 |
+
+实现要点：
+- 首字母只包一层 `<span>`，DOM 文本仍是完整的「Somewhere Among the Stars」（已用脚本读取 `textContent` 确认）。装饰 SVG 都是 `aria-hidden`。
+- 动效：标题 1.6s 由模糊、透明、下移淡入；首字母纹样 1.1s 后显现；星轨和星点 0.8s 后淡入，分隔线 1s 后展开。之后标题主体静止，只有流光（14s 一圈）、星点闪烁、分隔线三结纹呼吸在循环。
+- 星点与流光同步：星点在椭圆上的弧长比例用脚本数值积分算出，再换算成负的 `animation-delay`，流光经过时星点放大旋转一下。
+- 流光用 `stroke-dashoffset` 动画加一层宽而淡的同步描边代替模糊滤镜，不做逐帧滤镜计算。
+- 字号：1200px 以上按 3.6vw 单行显示；以下允许换行（`text-wrap: balance`）。Uncial 字形很宽，1024px 时单行放不下，所以单行断点定在 1200px。
+- `prefers-reduced-motion: reduce`：关闭全部动画，隐藏流光，标题和静态装饰照常显示（已用 DevTools 协议模拟确认计算样式）。
+
+测试：`astro check` 0 错误、Biome 通过、`pnpm build` exit 0。截图检查了 1440×900（亮色、暗色）、1024×768、820×1180、390×844，以及减少动态效果模式。字体由 Astro 下载，首次访问时标题字体没有预加载，可能短暂显示回退字体，入场模糊动画能遮掉大部分。
+
 ## 上线前必须处理（占位与遗留）
 
 - [ ] 浏览量 / 访客数目前是占位 `--`，接入统计接口前可在 `viewStatsConfig.ts` 关闭，避免上线后显示空值。
